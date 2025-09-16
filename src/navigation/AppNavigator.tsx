@@ -3,11 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import BottomTabs from "./BottomTabs";
 import LoginScreen from "../screens/auth/LoginScreen";
-
-export type RootStackParamList = {
-  LoginScreen: undefined;
-  Main: undefined;
-};
+import { RootStackParamList } from "./types";
 
 const Stack = createStackNavigator<RootStackParamList>();
 

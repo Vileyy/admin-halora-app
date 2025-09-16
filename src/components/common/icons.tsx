@@ -200,3 +200,29 @@ export const ChevronRightIcon = ({ size = 16, color = "#666" }: IconProps) => (
     <Text style={{ fontSize: size * 0.8, color }}>▶</Text>
   </View>
 );
+
+export const SettingsIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>⚙️</Text>
+  </View>
+);
+
+export const ShoppingCartIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>🛒</Text>
+  </View>
+);

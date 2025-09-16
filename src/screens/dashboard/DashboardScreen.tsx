@@ -47,6 +47,7 @@ interface SubMenuItem {
 
 export default function DashboardScreen() {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+
   const navigation = useNavigation();
 
   const toggleMenu = (menuId: string) => {
@@ -59,21 +60,42 @@ export default function DashboardScreen() {
 
   const handleNavigation = (menuId: string, submenuId?: string) => {
     switch (menuId) {
-      case "products":
+      case "vouchers":
         if (submenuId) {
-          console.log("Navigate to submenu:", submenuId);
+          console.log("Navigate to voucher submenu:", submenuId);
+          // TODO: Navigate to specific voucher screen
         } else {
-          navigation.navigate("Products" as never);
+          console.log("Navigate to vouchers main screen");
+          // TODO: Create vouchers main screen
         }
         break;
-      case "orders":
-        navigation.navigate("Orders" as never);
+      case "categories":
+        console.log("Navigate to categories management");
+        // TODO: Create categories screen
         break;
-      case "users":
-        navigation.navigate("Users" as never);
+      case "brands":
+        console.log("Navigate to brands management");
+        // TODO: Create brands screen
         break;
-      case "settings":
-        navigation.navigate("Settings" as never);
+      case "revenue":
+        console.log("Navigate to revenue management");
+        // TODO: Create revenue screen
+        break;
+      case "banners":
+        console.log("Navigate to banner management");
+        // TODO: Create banners screen
+        break;
+      case "notifications":
+        console.log("Navigate to notifications management");
+        // TODO: Create notifications screen
+        break;
+      case "reviews":
+        console.log("Navigate to reviews management");
+        // TODO: Create reviews screen
+        break;
+      case "warehouse":
+        console.log("Navigate to warehouse management");
+        // TODO: Create warehouse screen
         break;
       default:
         console.log("Navigate to:", menuId, submenuId || "");
@@ -82,25 +104,6 @@ export default function DashboardScreen() {
   };
 
   const menuItems: MenuItem[] = [
-    {
-      id: "products",
-      title: "Quản lý sản phẩm",
-      icon: <BoxIcon size={24} color="#fff" />,
-      color: "#6C5CE7",
-      hasSubmenu: true,
-      submenu: [
-        {
-          id: "flashdeals",
-          title: "FlashDeals",
-          icon: <TagIcon size={16} color="#A29BFE" />,
-        },
-        {
-          id: "new-products",
-          title: "Sản phẩm mới",
-          icon: <StarIcon size={16} color="#A29BFE" />,
-        },
-      ],
-    },
     {
       id: "vouchers",
       title: "Quản lý voucher",
@@ -123,18 +126,6 @@ export default function DashboardScreen() {
       title: "Quản lý thương hiệu",
       icon: <FolderIcon size={24} color="#fff" />,
       color: "#E84393",
-    },
-    {
-      id: "orders",
-      title: "Quản lý đơn hàng",
-      icon: <DocumentIcon size={24} color="#fff" />,
-      color: "#0984E3",
-    },
-    {
-      id: "users",
-      title: "Quản lý người dùng",
-      icon: <UsersIcon size={24} color="#fff" />,
-      color: "#00CEC9",
     },
     {
       id: "revenue",
