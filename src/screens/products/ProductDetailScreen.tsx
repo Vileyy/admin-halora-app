@@ -1,38 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
-  ScrollView,
   StyleSheet,
-  TouchableOpacity,
+  ScrollView,
+  Image,
+  ActivityIndicator,
   Alert,
-  Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../redux/store";
-import { deleteProduct } from "../../redux/slices/productSlice";
-import { Product, ProductVariant } from "../../types/product";
-import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { MaterialIcons } from "@expo/vector-icons";
+import { RootStackParamList } from "../../navigation/types";
+import { Product } from "../../types/product";
+import { ProductService } from "../../services/productService";
 
-interface ProductDetailScreenProps {
-  product: Product;
-  onEdit: (product: Product) => void;
-  onBack: () => void;
-}
+type ProductDetailScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ProductDetailScreen"
+>;
 
-const { width } = Dimensions.get("window");
+type ProductDetailScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "ProductDetailScreen"
+>;
 
-export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
-  product,
-  onEdit,
-  onBack,
-}) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector((state: RootState) => state.products);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants?.[0] || null
-  );
+export default function ProductDetailScreen() {
+  const navigation = useNavigation<ProductDetailScreenNavigationProp>();
+  const route = useRoute<ProductDetailScreenRouteProp>();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { productId } = route.params;
+
+  useEffect(() => {
+    loadProduct();
+  }, [productId]);
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      const result = await ProductService.getProductById(productId);
+
+      if (result.success && result.data) {
+        setProduct(result.data);
+      } else {
+        Alert.alert("Lỗi", "Không thể tải thông tin sản phẩm", [
+          {
+            text: "OK",
+            onPress: () => navigation.goBack(),
+          },
+        ]);
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi tải sản phẩm", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditProduct = () => {
+    navigation.navigate("EditProductScreen", { productId });
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -41,227 +76,163 @@ export const ProductDetailScreen: React.FC<ProductDetailScreenProps> = ({
     }).format(price);
   };
 
-  const handleDelete = () => {
-    Alert.alert("Xóa sản phẩm", "Bạn có chắc chắn muốn xóa sản phẩm này?", [
-      {
-        text: "Hủy",
-        style: "cancel",
-      },
-      {
-        text: "Xóa",
-        style: "destructive",
-        onPress: () => {
-          dispatch(deleteProduct(product.id));
-          onBack();
-        },
-      },
-    ]);
-  };
-
-  const handleEdit = () => {
-    onEdit(product);
-  };
-
-  const getTotalStock = () => {
-    if (!product.variants || product.variants.length === 0) return 0;
-    return product.variants.reduce(
-      (total, variant) => total + variant.stock,
-      0
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF99CC" />
+        <Text style={styles.loadingText}>Đang tải thông tin sản phẩm...</Text>
+      </SafeAreaView>
     );
-  };
+  }
 
-  const isFlashDeal =
-    product.isFlashDeal &&
-    product.flashDealEndTime &&
-    product.flashDealEndTime > Date.now();
+  if (!product) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <Text style={styles.errorText}>Không tìm thấy sản phẩm</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chi tiết sản phẩm</Text>
-        <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
-          <Ionicons name="create-outline" size={24} color="#FF99CC" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Product Image */}
         <View style={styles.imageContainer}>
-          <Image source={{ uri: product.imageUrl }} style={styles.image} />
-          {isFlashDeal && (
+          <Image
+            source={{ uri: product.imageUrl }}
+            style={styles.productImage}
+          />
+          {product.isFlashDeal && (
             <View style={styles.flashDealBadge}>
-              <Text style={styles.flashDealText}>Flash Deal</Text>
+              <Text style={styles.flashDealText}>FLASH DEAL</Text>
             </View>
           )}
         </View>
 
         {/* Product Info */}
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>{product.title}</Text>
-          <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.category}>Danh mục: {product.category}</Text>
+          <Text style={styles.productTitle}>{product.title}</Text>
+          <Text style={styles.productBrand}>{product.brand}</Text>
+          <Text style={styles.productCategory}>{product.category}</Text>
 
-          <Text style={styles.description}>{product.description}</Text>
+          {/* Description */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Mô tả sản phẩm</Text>
+            <Text style={styles.productDescription}>{product.description}</Text>
+          </View>
 
-          {/* Price Range */}
-          <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>Giá:</Text>
-            {product.variants && product.variants.length > 0 ? (
-              <View style={styles.priceRange}>
-                <Text style={styles.price}>
+          {/* Variants */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Các biến thể</Text>
+            {product.variants.map((variant, index) => (
+              <View key={variant.id} style={styles.variantCard}>
+                <View style={styles.variantInfo}>
+                  <Text style={styles.variantSize}>
+                    Kích thước: {variant.size}
+                  </Text>
+                  <Text style={styles.variantPrice}>
+                    {formatPrice(variant.price)}
+                  </Text>
+                </View>
+                <View style={styles.variantStock}>
+                  <Text style={styles.stockLabel}>Còn lại:</Text>
+                  <Text
+                    style={[
+                      styles.stockValue,
+                      variant.stock <= 5 ? styles.lowStock : styles.inStock,
+                    ]}
+                  >
+                    {variant.stock}
+                  </Text>
+                </View>
+                {variant.sku && (
+                  <Text style={styles.variantSku}>SKU: {variant.sku}</Text>
+                )}
+              </View>
+            ))}
+          </View>
+
+          {/* Product Stats */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Thông tin thêm</Text>
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Tổng số lượng:</Text>
+                <Text style={styles.statValue}>
+                  {product.variants.reduce(
+                    (total, variant) => total + variant.stock,
+                    0
+                  )}
+                </Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Giá thấp nhất:</Text>
+                <Text style={styles.statValue}>
                   {formatPrice(
                     Math.min(...product.variants.map((v) => v.price))
                   )}
                 </Text>
-                {product.variants.length > 1 && (
-                  <>
-                    <Text style={styles.priceSeparator}> - </Text>
-                    <Text style={styles.price}>
-                      {formatPrice(
-                        Math.max(...product.variants.map((v) => v.price))
-                      )}
-                    </Text>
-                  </>
-                )}
               </View>
-            ) : (
-              <Text style={styles.noPrice}>Chưa có giá</Text>
-            )}
-          </View>
-
-          {/* Stock Info */}
-          <View style={styles.stockContainer}>
-            <Text style={styles.stockLabel}>Tổng tồn kho:</Text>
-            <Text style={styles.stockValue}>{getTotalStock()} sản phẩm</Text>
-          </View>
-
-          {/* Variants */}
-          {product.variants && product.variants.length > 0 && (
-            <View style={styles.variantsContainer}>
-              <Text style={styles.variantsTitle}>Các loại sản phẩm:</Text>
-              {product.variants.map((variant, index) => (
-                <TouchableOpacity
-                  key={variant.id || index}
-                  style={[
-                    styles.variantItem,
-                    selectedVariant?.id === variant.id &&
-                      styles.selectedVariant,
-                  ]}
-                  onPress={() => setSelectedVariant(variant)}
-                >
-                  <View style={styles.variantInfo}>
-                    <Text style={styles.variantSize}>{variant.size}</Text>
-                    <Text style={styles.variantPrice}>
-                      {formatPrice(variant.price)}
-                    </Text>
-                  </View>
-                  <Text style={styles.variantStock}>Còn: {variant.stock}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Selected Variant Details */}
-          {selectedVariant && (
-            <View style={styles.selectedVariantContainer}>
-              <Text style={styles.selectedVariantTitle}>
-                Thông tin chi tiết:
-              </Text>
-              <View style={styles.selectedVariantInfo}>
-                <Text style={styles.selectedVariantText}>
-                  Dung tích: {selectedVariant.size}
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Giá cao nhất:</Text>
+                <Text style={styles.statValue}>
+                  {formatPrice(
+                    Math.max(...product.variants.map((v) => v.price))
+                  )}
                 </Text>
-                <Text style={styles.selectedVariantText}>
-                  Giá: {formatPrice(selectedVariant.price)}
-                </Text>
-                <Text style={styles.selectedVariantText}>
-                  Tồn kho: {selectedVariant.stock}
-                </Text>
-                {selectedVariant.sku && (
-                  <Text style={styles.selectedVariantText}>
-                    SKU: {selectedVariant.sku}
-                  </Text>
-                )}
               </View>
             </View>
-          )}
-
-          {/* Timestamps */}
-          <View style={styles.timestampsContainer}>
-            <Text style={styles.timestampText}>
-              Tạo: {new Date(product.createdAt).toLocaleDateString("vi-VN")}
-            </Text>
-            <Text style={styles.timestampText}>
-              Cập nhật:{" "}
-              {new Date(product.updatedAt).toLocaleDateString("vi-VN")}
-            </Text>
           </View>
         </View>
       </ScrollView>
 
-      {/* Action Buttons */}
-      <View style={styles.actionContainer}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editActionButton]}
-          onPress={handleEdit}
-        >
-          <Ionicons name="create-outline" size={20} color="#fff" />
-          <Text style={styles.actionButtonText}>Chỉnh sửa</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteActionButton]}
-          onPress={handleDelete}
-          disabled={loading}
-        >
-          <Ionicons name="trash-outline" size={20} color="#fff" />
-          <Text style={styles.actionButtonText}>Xóa</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      {/* Edit Button */}
+      <TouchableOpacity style={styles.editButton} onPress={handleEditProduct}>
+        <MaterialIcons name="edit" size={24} color="#fff" />
+        <Text style={styles.editButtonText}>Chỉnh sửa</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  editButton: {
-    padding: 8,
-  },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#ff4444",
   },
   imageContainer: {
     position: "relative",
-    width: "100%",
-    height: width * 0.8,
+    height: 300,
     backgroundColor: "#fff",
   },
-  image: {
+  productImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
@@ -270,10 +241,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 16,
     right: 16,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#ff4444",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 12,
   },
   flashDealText: {
     color: "#fff",
@@ -281,169 +252,131 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   infoContainer: {
-    backgroundColor: "#fff",
-    marginTop: 16,
     padding: 16,
   },
-  title: {
-    fontSize: 20,
+  productTitle: {
+    fontSize: 24,
     fontWeight: "bold",
     color: "#333",
     marginBottom: 8,
   },
-  brand: {
+  productBrand: {
     fontSize: 16,
-    color: "#666",
+    color: "#FF99CC",
+    fontWeight: "600",
     marginBottom: 4,
   },
-  category: {
+  productCategory: {
     fontSize: 14,
-    color: "#888",
-    marginBottom: 12,
+    color: "#666",
+    marginBottom: 20,
   },
-  description: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 20,
-    marginBottom: 16,
+  section: {
+    marginBottom: 24,
   },
-  priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  priceLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginRight: 8,
-  },
-  priceRange: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  price: {
+  sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#FF99CC",
-  },
-  priceSeparator: {
-    fontSize: 16,
-    color: "#666",
-  },
-  noPrice: {
-    fontSize: 16,
-    color: "#999",
-    fontStyle: "italic",
-  },
-  stockContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  stockLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginRight: 8,
-  },
-  stockValue: {
-    fontSize: 16,
-    color: "#666",
-  },
-  variantsContainer: {
-    marginBottom: 16,
-  },
-  variantsTitle: {
-    fontSize: 16,
     fontWeight: "600",
     color: "#333",
     marginBottom: 12,
   },
-  variantItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 12,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "transparent",
+  productDescription: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#666",
   },
-  selectedVariant: {
-    borderColor: "#FF99CC",
-    backgroundColor: "#fff5f8",
+  variantCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#eee",
   },
   variantInfo: {
-    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
   variantSize: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
     color: "#333",
   },
   variantPrice: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#FF99CC",
-    fontWeight: "600",
   },
   variantStock: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  stockLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginRight: 8,
+  },
+  stockValue: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  lowStock: {
+    color: "#ff4444",
+  },
+  inStock: {
+    color: "#28a745",
+  },
+  variantSku: {
     fontSize: 12,
+    color: "#999",
+  },
+  statsContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  statItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  statLabel: {
+    fontSize: 14,
     color: "#666",
   },
-  selectedVariantContainer: {
-    backgroundColor: "#f8f9fa",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  selectedVariantTitle: {
+  statValue: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
-    marginBottom: 8,
   },
-  selectedVariantInfo: {
-    gap: 4,
-  },
-  selectedVariantText: {
-    fontSize: 14,
-    color: "#555",
-  },
-  timestampsContainer: {
-    borderTopWidth: 1,
-    borderTopColor: "#e9ecef",
-    paddingTop: 12,
-    gap: 4,
-  },
-  timestampText: {
-    fontSize: 12,
-    color: "#888",
-  },
-  actionContainer: {
-    flexDirection: "row",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#e9ecef",
-  },
-  actionButton: {
-    flex: 1,
+  editButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#FF99CC",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 8,
-    marginHorizontal: 4,
+    borderRadius: 25,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
-  editActionButton: {
-    backgroundColor: "#FF99CC",
-  },
-  deleteActionButton: {
-    backgroundColor: "#dc3545",
-  },
-  actionButtonText: {
+  editButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",

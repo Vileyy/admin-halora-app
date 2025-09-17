@@ -94,8 +94,7 @@ export default function DashboardScreen() {
         // TODO: Create reviews screen
         break;
       case "warehouse":
-        console.log("Navigate to warehouse management");
-        // TODO: Create warehouse screen
+        (navigation as any).navigate("Inventory");
         break;
       default:
         console.log("Navigate to:", menuId, submenuId || "");

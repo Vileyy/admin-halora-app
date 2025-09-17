@@ -3,16 +3,24 @@ import { View, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { RootState, AppDispatch } from "../../redux/store";
-import { fetchProducts } from "../../redux/slices/productSlice";
+import { fetchProducts, deleteProduct } from "../../redux/slices/productSlice";
 import { ProductList } from "../../components/products/ProductList";
 import { FloatingActionButton } from "../../components/products/FloatingActionButton";
 import { Product } from "../../types/product";
+import { RootStackParamList } from "../../navigation/types";
 
 const Tab = createMaterialTopTabNavigator();
 
-// Flash Deals Tab
+type ProductsScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Main"
+>;
+
 const FlashDealsTab = () => {
+  const navigation = useNavigation<ProductsScreenNavigationProp>();
   const dispatch = useDispatch<AppDispatch>();
   const { flashDeals, loading, error } = useSelector(
     (state: RootState) => state.products
@@ -23,18 +31,43 @@ const FlashDealsTab = () => {
   }, [dispatch]);
 
   const handleProductPress = (product: Product) => {
-    // Navigate to product detail
-    console.log("Navigate to product detail:", product.id);
+    navigation.navigate("ProductDetailScreen", { productId: product.id });
   };
 
   const handleEditProduct = (product: Product) => {
-    // Navigate to edit product form
-    console.log("Edit product:", product.id);
+    navigation.navigate("EditProductScreen", { productId: product.id });
   };
 
   const handleDeleteProduct = (product: Product) => {
-    // Show delete confirmation and delete product
-    console.log("Delete product:", product.id);
+    Alert.alert(
+      "Xác nhận xóa",
+      `Bạn có chắc chắn muốn xóa sản phẩm "${product.title}"?`,
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+        },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await dispatch(deleteProduct(product.id));
+              if (deleteProduct.fulfilled.match(result)) {
+                Alert.alert("Thành công", "Sản phẩm đã được xóa thành công!");
+              } else {
+                Alert.alert(
+                  "Lỗi",
+                  (result.payload as string) || "Có lỗi xảy ra khi xóa sản phẩm"
+                );
+              }
+            } catch (error) {
+              Alert.alert("Lỗi", "Có lỗi xảy ra khi xóa sản phẩm");
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleRefresh = () => {
@@ -57,6 +90,7 @@ const FlashDealsTab = () => {
 
 // New Products Tab
 const NewProductsTab = () => {
+  const navigation = useNavigation<ProductsScreenNavigationProp>();
   const dispatch = useDispatch<AppDispatch>();
   const { newProducts, loading, error } = useSelector(
     (state: RootState) => state.products
@@ -67,18 +101,43 @@ const NewProductsTab = () => {
   }, [dispatch]);
 
   const handleProductPress = (product: Product) => {
-    // Navigate to product detail
-    console.log("Navigate to product detail:", product.id);
+    navigation.navigate("ProductDetailScreen", { productId: product.id });
   };
 
   const handleEditProduct = (product: Product) => {
-    // Navigate to edit product form
-    console.log("Edit product:", product.id);
+    navigation.navigate("EditProductScreen", { productId: product.id });
   };
 
   const handleDeleteProduct = (product: Product) => {
-    // Show delete confirmation and delete product
-    console.log("Delete product:", product.id);
+    Alert.alert(
+      "Xác nhận xóa",
+      `Bạn có chắc chắn muốn xóa sản phẩm "${product.title}"?`,
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+        },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await dispatch(deleteProduct(product.id));
+              if (deleteProduct.fulfilled.match(result)) {
+                Alert.alert("Thành công", "Sản phẩm đã được xóa thành công!");
+              } else {
+                Alert.alert(
+                  "Lỗi",
+                  (result.payload as string) || "Có lỗi xảy ra khi xóa sản phẩm"
+                );
+              }
+            } catch (error) {
+              Alert.alert("Lỗi", "Có lỗi xảy ra khi xóa sản phẩm");
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleRefresh = () => {
@@ -100,9 +159,10 @@ const NewProductsTab = () => {
 };
 
 export default function ProductsScreen() {
+  const navigation = useNavigation<ProductsScreenNavigationProp>();
+
   const handleAddProduct = () => {
-    // Navigate to add product form
-    console.log("Navigate to add product form");
+    navigation.navigate("AddProductScreen");
   };
 
   return (

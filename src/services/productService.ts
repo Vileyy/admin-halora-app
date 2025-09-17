@@ -166,17 +166,41 @@ export class ProductService {
         return { success: false, error: "Product not found" };
       }
 
-      const product = result.data[productId];
-      if (!product) {
+      const productRaw = result.data[productId];
+      if (!productRaw) {
         return { success: false, error: "Product not found" };
       }
 
+      // Transform the raw data to Product format
+      const product: Product = {
+        id: productId,
+        title: productRaw.name,
+        description: productRaw.description,
+        category:
+          productRaw.category === "FlashDeals"
+            ? "Flash Deal"
+            : productRaw.category === "new_product"
+            ? "Sản phẩm mới"
+            : productRaw.category,
+        brand: productRaw.brand || "Unknown",
+        imageUrl: productRaw.image,
+        variants:
+          productRaw.variants?.map((variant: any, index: number) => ({
+            id: `${productId}_variant_${index}`,
+            size: variant.size,
+            price: variant.price,
+            stock: variant.stockQty || variant.stock || 0,
+            sku: variant.sku,
+          })) || [],
+        isFlashDeal: productRaw.category === "FlashDeals",
+        flashDealEndTime: productRaw.flashDealEndTime,
+        createdAt: productRaw.createdAt || Date.now(),
+        updatedAt: productRaw.updatedAt || Date.now(),
+      };
+
       return {
         success: true,
-        data: {
-          id: productId,
-          ...product,
-        },
+        data: product,
       };
     } catch (error) {
       return {

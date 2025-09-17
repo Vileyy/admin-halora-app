@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 // Screens
 import DashboardScreen from "../screens/dashboard/DashboardScreen";
 import ProductsScreen from "../screens/products/ProductsScreen";
+import InventoryScreen from "../screens/inventory/InventoryScreen";
 import OrdersScreen from "../screens/orders/OrdersScreen";
 import UsersScreen from "../screens/users/UsersScreen";
 import SettingsScreen from "../screens/settings/SettingsScreen";
@@ -13,6 +14,7 @@ import SettingsScreen from "../screens/settings/SettingsScreen";
 import {
   ChartIcon,
   BoxIcon,
+  DatabaseIcon,
   ShoppingCartIcon,
   UsersIcon,
   SettingsIcon,
@@ -37,6 +39,8 @@ const BottomTabs = () => {
               return <ChartIcon size={iconSize} color={iconColor} />;
             case "Products":
               return <BoxIcon size={iconSize} color={iconColor} />;
+            case "Inventory":
+              return <DatabaseIcon size={iconSize} color={iconColor} />;
             case "Orders":
               return <ShoppingCartIcon size={iconSize} color={iconColor} />;
             case "Users":
@@ -87,6 +91,13 @@ const BottomTabs = () => {
         component={ProductsScreen}
         options={{
           tabBarLabel: "Sản phẩm",
+        }}
+      />
+      <Tab.Screen
+        name="Inventory"
+        component={InventoryScreen}
+        options={{
+          tabBarLabel: "Kho hàng",
         }}
       />
       <Tab.Screen
