@@ -354,14 +354,15 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Tên biến thể *</Text>
+                <Text style={styles.label}>Dung tích *</Text>
                 <TextInput
                   style={styles.input}
                   value={variant.name}
                   onChangeText={(value) =>
                     handleVariantChange(index, "name", value)
                   }
-                  placeholder="VD: 50ml, Size M, Màu đỏ..."
+                  keyboardType="numeric"
+                  placeholder="VD: 50ml,..."
                   placeholderTextColor="#8F9BB3"
                 />
               </View>

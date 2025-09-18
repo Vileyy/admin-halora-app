@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, ActivityIndicator, View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import {
@@ -11,11 +11,10 @@ import {
 import { InventoryForm } from "../../components/inventory/InventoryForm";
 import { InventoryItem } from "../../types/inventory";
 
-interface EditInventoryScreenRouteProp {
-  params: {
-    id: string;
-  };
-}
+type EditInventoryScreenRouteProp = RouteProp<
+  { EditInventory: { id: string } },
+  "EditInventory"
+>;
 
 export default function EditInventoryScreen() {
   const navigation = useNavigation();

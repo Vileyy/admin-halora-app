@@ -22,22 +22,18 @@ export default function AddProductScreen() {
   const handleSubmit = async (productData: any) => {
     try {
       const result = await dispatch(addProduct(productData));
-      
+
       if (addProduct.fulfilled.match(result)) {
-        Alert.alert(
-          "Thành công",
-          "Sản phẩm đã được thêm thành công!",
-          [
-            {
-              text: "OK",
-              onPress: () => navigation.goBack(),
-            },
-          ]
-        );
+        Alert.alert("Thành công", "Sản phẩm đã được thêm thành công!", [
+          {
+            text: "OK",
+            onPress: () => navigation.goBack(),
+          },
+        ]);
       } else {
         Alert.alert(
           "Lỗi",
-          result.payload as string || "Có lỗi xảy ra khi thêm sản phẩm"
+          (result.payload as string) || "Có lỗi xảy ra khi thêm sản phẩm"
         );
       }
     } catch (error) {
@@ -51,6 +47,7 @@ export default function AddProductScreen() {
         onSubmit={handleSubmit}
         isLoading={loading}
         submitButtonText="Thêm sản phẩm"
+        useInventorySelection={true}
       />
     </SafeAreaView>
   );
