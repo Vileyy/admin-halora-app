@@ -80,8 +80,7 @@ export default function DashboardScreen() {
         // TODO: Create revenue screen
         break;
       case "banners":
-        console.log("Navigate to banner management");
-        // TODO: Create banners screen
+        (navigation as any).navigate("Banners");
         break;
       case "notifications":
         console.log("Navigate to notifications management");
