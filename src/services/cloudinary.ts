@@ -1,8 +1,49 @@
+import * as ImagePicker from "expo-image-picker";
+
 // Cloudinary configuration
 const CLOUDINARY_CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.EXPO_PUBLIC_CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.EXPO_PUBLIC_CLOUDINARY_API_SECRET;
 const CLOUDINARY_UPLOAD_PRESET = "my_preset";
+
+// Pick and upload image to Cloudinary
+export const pickAndUploadImage = async (
+  folder: string = "halora-categories"
+): Promise<string | null> => {
+  try {
+    // Request permission
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      throw new Error("Permission to access camera roll is required!");
+    }
+
+    // Pick image
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const imageUri = result.assets[0].uri;
+      const uploadResult = await uploadImage(imageUri, folder);
+
+      if (uploadResult.success) {
+        return uploadResult.url;
+      } else {
+        throw new Error(uploadResult.error || "Upload failed");
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error picking and uploading image:", error);
+    throw error;
+  }
+};
 
 // Upload image to Cloudinary using REST API
 export const uploadImage = async (

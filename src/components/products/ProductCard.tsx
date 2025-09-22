@@ -18,7 +18,7 @@ interface ProductCardProps {
 }
 
 const { width } = Dimensions.get("window");
-const cardWidth = (width - 24) / 2; // 2 columns with 8px margin each side
+const cardWidth = (width - 48) / 2; // 2 columns with 16px margin each side + 16px gap between cards
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     width: cardWidth,
     backgroundColor: "#fff",
     borderRadius: 16,
-    marginBottom: 20,
+    marginBottom: 0, // Remove bottom margin since we handle spacing in ProductList
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 15,
@@ -130,8 +131,10 @@ const styles = StyleSheet.create({
   variantsContainer: {
     marginBottom: 16,
     backgroundColor: "#f8f9fa",
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
   variantItem: {
     flexDirection: "row",
@@ -159,7 +162,8 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 8,
+    gap: 10,
+    marginTop: 4,
   },
   editButton: {
     flex: 1,

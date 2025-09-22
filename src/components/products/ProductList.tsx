@@ -95,12 +95,14 @@ export const ProductList: React.FC<ProductListProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   row: {
     justifyContent: "space-between",
     paddingHorizontal: 0,
+    marginBottom: 16,
   },
   emptyContainer: {
     flex: 1,

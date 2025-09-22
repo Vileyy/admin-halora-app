@@ -16,4 +16,7 @@ export type RootStackParamList = {
   ProductDetailScreen: { productId: string };
   AddInventory: undefined;
   EditInventory: { id: string };
+  Categories: undefined;
+  AddCategory: undefined;
+  EditCategory: { category: any };
 };
