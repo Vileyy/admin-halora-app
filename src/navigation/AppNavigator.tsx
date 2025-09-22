@@ -12,6 +12,9 @@ import EditInventoryScreen from "../screens/inventory/EditInventoryScreen";
 import CategoriesScreen from "../screens/categories/CategoriesScreen";
 import AddCategoryScreen from "../screens/categories/AddCategoryScreen";
 import EditCategoryScreen from "../screens/categories/EditCategoryScreen";
+import BrandsScreen from "../screens/brands/BrandsScreen";
+import AddBrandScreen from "../screens/brands/AddBrandScreen";
+import EditBrandScreen from "../screens/brands/EditBrandScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -35,6 +38,9 @@ const AppNavigator = () => {
         <Stack.Screen name="Categories" component={CategoriesScreen} />
         <Stack.Screen name="AddCategory" component={AddCategoryScreen} />
         <Stack.Screen name="EditCategory" component={EditCategoryScreen} />
+        <Stack.Screen name="Brands" component={BrandsScreen} />
+        <Stack.Screen name="AddBrand" component={AddBrandScreen} />
+        <Stack.Screen name="EditBrand" component={EditBrandScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

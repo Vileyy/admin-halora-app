@@ -19,4 +19,7 @@ export type RootStackParamList = {
   Categories: undefined;
   AddCategory: undefined;
   EditCategory: { category: any };
+  Brands: undefined;
+  AddBrand: undefined;
+  EditBrand: { brand: any };
 };

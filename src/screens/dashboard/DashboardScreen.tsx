@@ -73,8 +73,7 @@ export default function DashboardScreen() {
         (navigation as any).navigate("Categories");
         break;
       case "brands":
-        console.log("Navigate to brands management");
-        // TODO: Create brands screen
+        (navigation as any).navigate("Brands");
         break;
       case "revenue":
         console.log("Navigate to revenue management");
