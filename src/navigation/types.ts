@@ -30,4 +30,6 @@ export type RootStackParamList = {
   EditNotification: { notification: any };
   Reviews: undefined;
   Revenue: undefined;
+  Vouchers: undefined;
+  AddVoucher: { type?: "shipping" | "product" };
 };

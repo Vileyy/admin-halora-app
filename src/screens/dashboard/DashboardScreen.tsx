@@ -61,13 +61,7 @@ export default function DashboardScreen() {
   const handleNavigation = (menuId: string, submenuId?: string) => {
     switch (menuId) {
       case "vouchers":
-        if (submenuId) {
-          console.log("Navigate to voucher submenu:", submenuId);
-          // TODO: Navigate to specific voucher screen
-        } else {
-          console.log("Navigate to vouchers main screen");
-          // TODO: Create vouchers main screen
-        }
+        (navigation as any).navigate("Vouchers");
         break;
       case "categories":
         (navigation as any).navigate("Categories");
@@ -102,11 +96,6 @@ export default function DashboardScreen() {
       title: "Quản lý voucher",
       icon: <TagIcon size={24} color="#fff" />,
       color: "#00B894",
-      hasSubmenu: true,
-      submenu: [
-        { id: "shipping-vouchers", title: "Voucher phí vận chuyển" },
-        { id: "discount-vouchers", title: "Mã giảm giá sản phẩm" },
-      ],
     },
     {
       id: "categories",
