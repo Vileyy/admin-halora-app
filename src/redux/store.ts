@@ -6,6 +6,7 @@ import categoryReducer from "./slices/categorySlice";
 import bannerReducer from "./slices/bannerSlice";
 import notificationReducer from "./slices/notificationSlice";
 import reviewReducer from "./slices/reviewSlice";
+import revenueReducer from "./slices/revenueSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     banners: bannerReducer,
     notifications: notificationReducer,
     reviews: reviewReducer,
+    revenue: revenueReducer,
   },
 });
 

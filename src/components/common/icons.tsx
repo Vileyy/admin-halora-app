@@ -286,3 +286,68 @@ export const TrashIcon = ({ size = 24, color = "#666" }: IconProps) => (
     <Text style={{ fontSize: size * 0.8, color }}>🗑️</Text>
   </View>
 );
+
+export const FilterIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>⚙️</Text>
+  </View>
+);
+
+export const SearchIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>🔍</Text>
+  </View>
+);
+
+export const CalendarIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>📅</Text>
+  </View>
+);
+
+export const TrendingUpIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>📈</Text>
+  </View>
+);
+
+export const PackageIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>📦</Text>
+  </View>
+);

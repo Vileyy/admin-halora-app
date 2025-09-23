@@ -74,20 +74,31 @@ const ReviewList: React.FC<ReviewListProps> = ({
       {/* Filter Section */}
       <View style={styles.filterSection}>
         <View style={styles.filterHeader}>
-          <Text style={styles.filterTitle}>
-            Danh sách đánh giá ({reviews.length})
-          </Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.filterTitle}>Danh sách đánh giá</Text>
+            <View style={styles.countBadge}>
+              <Text style={styles.countText}>{reviews.length}</Text>
+            </View>
+          </View>
           <TouchableOpacity style={styles.filterButton} onPress={onFilterPress}>
-            <Text style={styles.filterButtonText}>🔍 Bộ lọc</Text>
+            <Text style={styles.filterButtonText}>🔍</Text>
             {hasActiveFilters && <View style={styles.filterIndicator} />}
           </TouchableOpacity>
         </View>
 
         {hasActiveFilters && (
           <View style={styles.activeFiltersContainer}>
-            <Text style={styles.activeFiltersText}>Bộ lọc đang hoạt động</Text>
-            <TouchableOpacity onPress={onClearFilters}>
-              <Text style={styles.clearFiltersLink}>Xóa bộ lọc</Text>
+            <View style={styles.activeFiltersInfo}>
+              <Text style={styles.activeFiltersIcon}>🔽</Text>
+              <Text style={styles.activeFiltersText}>
+                Bộ lọc đang hoạt động
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.clearFiltersButton}
+              onPress={onClearFilters}
+            >
+              <Text style={styles.clearFiltersText}>Xóa</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -153,17 +164,73 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   headerContainer: {
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F8FAFC",
   },
   statsSection: {
-    marginBottom: 20,
+    marginBottom: 8,
   },
   filterSection: {
     backgroundColor: "#fff",
-    borderRadius: 16,
+    borderRadius: 20,
     marginHorizontal: 16,
-    padding: 16,
-    marginBottom: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#6C5CE7",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(108, 92, 231, 0.1)",
+  },
+  filterHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  filterTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#2E3A59",
+    marginRight: 12,
+  },
+  countBadge: {
+    backgroundColor: "#6C5CE7",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    shadowColor: "#6C5CE7",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  countText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  filterButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#F7F9FC",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    borderWidth: 2,
+    borderColor: "#E4E7EB",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -171,59 +238,63 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-  },
-  filterHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  filterTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#2E3A59",
-  },
-  filterButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#6C5CE7",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    position: "relative",
+    elevation: 2,
   },
   filterButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
+    fontSize: 18,
   },
   filterIndicator: {
     position: "absolute",
     top: -2,
     right: -2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#FF6B6B",
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#FF4757",
+    borderWidth: 2,
+    borderColor: "#fff",
+    shadowColor: "#FF4757",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 3,
   },
   activeFiltersContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 12,
-    paddingTop: 12,
+    marginTop: 16,
+    paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: "#F1F3F4",
   },
-  activeFiltersText: {
-    fontSize: 14,
-    color: "#8F9BB3",
-    fontWeight: "500",
+  activeFiltersInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
-  clearFiltersLink: {
-    fontSize: 14,
-    color: "#6C5CE7",
+  activeFiltersIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  activeFiltersText: {
+    fontSize: 15,
+    color: "#8F9BB3",
     fontWeight: "600",
+  },
+  clearFiltersButton: {
+    backgroundColor: "#FF4757",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  clearFiltersText: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "700",
   },
   emptyContainer: {
     flex: 1,
@@ -249,17 +320,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 24,
     marginBottom: 24,
-  },
-  clearFiltersButton: {
-    backgroundColor: "#6C5CE7",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  clearFiltersText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
   },
   footerContainer: {
     alignItems: "center",
