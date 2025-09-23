@@ -25,4 +25,7 @@ export type RootStackParamList = {
   Banners: undefined;
   AddBanner: undefined;
   EditBanner: { banner: any };
+  Notifications: undefined;
+  AddNotification: undefined;
+  EditNotification: { notification: any };
 };

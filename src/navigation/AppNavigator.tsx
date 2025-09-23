@@ -18,6 +18,9 @@ import EditBrandScreen from "../screens/brands/EditBrandScreen";
 import BannersScreen from "../screens/banners/BannersScreen";
 import AddBannerScreen from "../screens/banners/AddBannerScreen";
 import EditBannerScreen from "../screens/banners/EditBannerScreen";
+import NotificationsScreen from "../screens/notifications/NotificationsScreen";
+import AddNotificationScreen from "../screens/notifications/AddNotificationScreen";
+import EditNotificationScreen from "../screens/notifications/EditNotificationScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -47,6 +50,15 @@ const AppNavigator = () => {
         <Stack.Screen name="Banners" component={BannersScreen} />
         <Stack.Screen name="AddBanner" component={AddBannerScreen} />
         <Stack.Screen name="EditBanner" component={EditBannerScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen
+          name="AddNotification"
+          component={AddNotificationScreen}
+        />
+        <Stack.Screen
+          name="EditNotification"
+          component={EditNotificationScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

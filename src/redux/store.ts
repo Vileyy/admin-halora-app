@@ -4,6 +4,7 @@ import inventoryReducer from "./slices/inventorySlice";
 import brandReducer from "./slices/brandSlice";
 import categoryReducer from "./slices/categorySlice";
 import bannerReducer from "./slices/bannerSlice";
+import notificationReducer from "./slices/notificationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     brands: brandReducer,
     categories: categoryReducer,
     banners: bannerReducer,
+    notifications: notificationReducer,
   },
 });
 
