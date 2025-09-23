@@ -86,8 +86,7 @@ export default function DashboardScreen() {
         (navigation as any).navigate("Notifications");
         break;
       case "reviews":
-        console.log("Navigate to reviews management");
-        // TODO: Create reviews screen
+        (navigation as any).navigate("Reviews");
         break;
       case "warehouse":
         (navigation as any).navigate("Inventory");

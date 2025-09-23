@@ -21,6 +21,7 @@ import EditBannerScreen from "../screens/banners/EditBannerScreen";
 import NotificationsScreen from "../screens/notifications/NotificationsScreen";
 import AddNotificationScreen from "../screens/notifications/AddNotificationScreen";
 import EditNotificationScreen from "../screens/notifications/EditNotificationScreen";
+import ReviewsScreen from "../screens/reviews/ReviewsScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -59,6 +60,7 @@ const AppNavigator = () => {
           name="EditNotification"
           component={EditNotificationScreen}
         />
+        <Stack.Screen name="Reviews" component={ReviewsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -6,6 +6,10 @@ interface IconProps {
   color?: string;
 }
 
+interface StarIconProps extends IconProps {
+  filled?: boolean;
+}
+
 export const DatabaseIcon = ({ size = 24, color = "#666" }: IconProps) => (
   <View
     style={{
@@ -123,7 +127,11 @@ export const NotificationIcon = ({ size = 24, color = "#666" }: IconProps) => (
   </View>
 );
 
-export const StarIcon = ({ size = 24, color = "#666" }: IconProps) => (
+export const StarIcon = ({
+  size = 24,
+  color = "#666",
+  filled = true,
+}: StarIconProps) => (
   <View
     style={{
       width: size,
@@ -132,7 +140,20 @@ export const StarIcon = ({ size = 24, color = "#666" }: IconProps) => (
       alignItems: "center",
     }}
   >
-    <Text style={{ fontSize: size * 0.8, color }}>⭐</Text>
+    <Text style={{ fontSize: size * 0.8, color }}>{filled ? "★" : "☆"}</Text>
+  </View>
+);
+
+export const UserIcon = ({ size = 24, color = "#666" }: IconProps) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Text style={{ fontSize: size * 0.8, color }}>👤</Text>
   </View>
 );
 

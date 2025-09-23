@@ -28,4 +28,5 @@ export type RootStackParamList = {
   Notifications: undefined;
   AddNotification: undefined;
   EditNotification: { notification: any };
+  Reviews: undefined;
 };
