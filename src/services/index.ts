@@ -12,3 +12,4 @@ export { ProductService } from "./productService";
 
 // User services
 export { userService } from "./userService";
+export { orderService } from "./orderService";
