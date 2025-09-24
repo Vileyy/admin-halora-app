@@ -9,3 +9,6 @@ export { default as cloudinary } from "./cloudinary";
 
 // Product services
 export { ProductService } from "./productService";
+
+// User services
+export { userService } from "./userService";
