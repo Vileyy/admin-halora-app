@@ -16,6 +16,7 @@ export interface Product {
   variants: ProductVariant[];
   isFlashDeal?: boolean;
   flashDealEndTime?: number;
+  originalProductId?: string; // ID của sản phẩm gốc từ kho
   createdAt: number;
   updatedAt: number;
 }
@@ -29,6 +30,7 @@ export interface ProductFormData {
   variants: Omit<ProductVariant, "id">[];
   isFlashDeal?: boolean;
   flashDealEndTime?: number;
+  originalProductId?: string; // ID của sản phẩm gốc từ kho
 }
 
 export interface ProductState {

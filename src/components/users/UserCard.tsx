@@ -115,16 +115,18 @@ const UserCard: React.FC<UserCardProps> = ({
     >
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image
-            source={{
-              uri:
-                user.avatar ||
-                user.photoURL ||
-                "https://via.placeholder.com/50",
-            }}
-            style={styles.avatar}
-            defaultSource={require("../../../assets/icon.png")}
-          />
+          {user.avatar || user.photoURL ? (
+            <Image
+              source={{
+                uri: user.avatar || user.photoURL,
+              }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatarTemplate}>
+              <Ionicons name="person" size={24} color="#9CA3AF" />
+            </View>
+          )}
           <View
             style={[
               styles.statusIndicator,
@@ -226,6 +228,16 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     backgroundColor: "#F5F5F5",
+  },
+  avatarTemplate: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   statusIndicator: {
     position: "absolute",

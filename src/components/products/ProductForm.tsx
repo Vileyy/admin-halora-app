@@ -21,7 +21,7 @@ import { InventoryItem } from "../../types/inventory";
 import { uploadImage } from "../../services/cloudinary";
 import { RootState, AppDispatch } from "../../redux/store";
 import { fetchInventory } from "../../redux/slices/inventorySlice";
-import { fetchAllBrands } from "../../redux/slices/brandSlice";
+import { fetchBrands } from "../../redux/slices/brandSlice";
 
 interface ProductFormProps {
   initialProduct?: Product;
@@ -65,6 +65,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const { brands, loading: brandsLoading } = useSelector(
     (state: RootState) => state.brands
   );
+  const { flashDeals, newProducts } = useSelector(
+    (state: RootState) => state.products
+  );
   const [formData, setFormData] = useState<FormData>({
     title: initialProduct?.title || "",
     description: initialProduct?.description || "",
@@ -93,9 +96,44 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (useInventorySelection) {
       dispatch(fetchInventory());
-      dispatch(fetchAllBrands());
+      dispatch(fetchBrands());
     }
   }, [dispatch, useInventorySelection]);
+
+  // Lọc bỏ các sản phẩm đã có trong FlashDeals và NewProducts
+  const getUsedInventoryIds = (): string[] => {
+    const usedIds: string[] = [];
+
+    // Lấy originalProductId từ flashDeals và newProducts
+    flashDeals.forEach((product) => {
+      if (product.originalProductId) {
+        usedIds.push(product.originalProductId);
+      }
+    });
+
+    newProducts.forEach((product) => {
+      if (product.originalProductId) {
+        usedIds.push(product.originalProductId);
+      }
+    });
+
+    return [...new Set(usedIds)]; 
+  };
+
+  const availableInventoryItems = inventoryItems.filter((item) => {
+    const usedIds = getUsedInventoryIds();
+    const isUsedById = usedIds.includes(item.id);
+
+    // Nếu không tìm thấy theo ID, kiểm tra theo tên sản phẩm
+    if (!isUsedById) {
+      const isUsedByName = [...flashDeals, ...newProducts].some(
+        (product) => product.title === item.name && !product.originalProductId
+      );
+      return !isUsedByName;
+    }
+
+    return !isUsedById;
+  });
 
   // Hàm để lấy tên brand từ brandId
   const getBrandName = (brandId: string): string => {
@@ -105,7 +143,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   // Xử lý khi chọn sản phẩm từ kho
   const handleInventorySelection = (inventoryId: string) => {
-    const selectedItem = inventoryItems.find((item) => item.id === inventoryId);
+    const selectedItem = availableInventoryItems.find(
+      (item) => item.id === inventoryId
+    );
     if (selectedItem) {
       setSelectedInventoryItem(selectedItem);
       setAvailableVariants(selectedItem.variants || []);
@@ -120,9 +160,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         description: selectedItem.description,
         brand: getBrandName(selectedItem.brandId),
         imageUrl: selectedItem.media?.[0]?.url || "",
-        variants: [], 
+        variants: [],
       }));
-      
+
       setErrors({});
     }
   };
@@ -265,9 +305,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         sku: variant.sku?.trim() || "",
       })),
       isFlashDeal: formData.isFlashDeal,
-      ...(useInventorySelection && {
-        originalProductId: formData.originalProductId,
-      }),
+      originalProductId: formData.originalProductId,
     };
 
     await onSubmit(productData);
@@ -447,7 +485,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <View style={styles.modalHeader}>
                 <View style={styles.modalHeaderContent}>
                   <MaterialIcons name="inventory" size={24} color="#FF99CC" />
-                  <Text style={styles.modalTitle}>Chọn sản phẩm từ kho</Text>
+                  <View style={styles.modalTitleContainer}>
+                    <Text style={styles.modalTitle}>Chọn sản phẩm từ kho</Text>
+                    <Text style={styles.modalSubtitle}>
+                      {availableInventoryItems.length} sản phẩm khả dụng
+                    </Text>
+                  </View>
                 </View>
                 <TouchableOpacity
                   style={styles.modalCloseButton}
@@ -464,9 +507,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     Đang tải danh sách kho...
                   </Text>
                 </View>
+              ) : availableInventoryItems.length === 0 ? (
+                <View style={styles.modalEmptyContainer}>
+                  <MaterialIcons name="inventory-2" size={64} color="#d1d5db" />
+                  <Text style={styles.modalEmptyTitle}>
+                    Không có sản phẩm khả dụng
+                  </Text>
+                  <Text style={styles.modalEmptySubtitle}>
+                    Tất cả sản phẩm trong kho đã được thêm vào FlashDeals hoặc
+                    Sản phẩm mới
+                  </Text>
+                </View>
               ) : (
                 <FlatList
-                  data={inventoryItems}
+                  data={availableInventoryItems}
                   renderItem={renderInventoryItem}
                   keyExtractor={(item) => item.id}
                   contentContainerStyle={styles.inventoryList}
@@ -1292,6 +1346,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
+    marginRight: 50,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
@@ -1300,16 +1355,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  modalTitleContainer: {
+    marginLeft: 8,
+    flex: 1,
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: "600",
     color: "#1f2937",
-    marginLeft: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginTop: 2,
   },
   modalCloseButton: {
     padding: 8,
     borderRadius: 8,
     backgroundColor: "#f3f4f6",
+    marginRight: 50,
   },
   modalLoadingContainer: {
     flex: 1,
@@ -1321,6 +1385,26 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: "#6b7280",
+  },
+  modalEmptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+  },
+  modalEmptyTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#374151",
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  modalEmptySubtitle: {
+    fontSize: 16,
+    color: "#6b7280",
+    textAlign: "center",
+    lineHeight: 22,
   },
   inventoryList: {
     padding: 20,

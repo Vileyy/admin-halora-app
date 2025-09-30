@@ -50,6 +50,7 @@ export const fetchProducts = createAsyncThunk(
                 })) || [],
               isFlashDeal: product.category === "FlashDeals",
               flashDealEndTime: product.flashDealEndTime,
+              originalProductId: product.originalProductId,
               createdAt: product.createdAt || Date.now(),
               updatedAt: product.updatedAt || Date.now(),
             }))
@@ -91,6 +92,7 @@ export const addProduct = createAsyncThunk(
           stockQty: variant.stock,
           sku: variant.sku,
         })),
+        originalProductId: productData.originalProductId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -138,6 +140,9 @@ export const updateProduct = createAsyncThunk(
       }
       if (updates.isFlashDeal !== undefined) {
         dbUpdates.category = updates.isFlashDeal ? "FlashDeals" : "new_product";
+      }
+      if (updates.originalProductId !== undefined) {
+        dbUpdates.originalProductId = updates.originalProductId;
       }
       dbUpdates.updatedAt = Date.now();
 
