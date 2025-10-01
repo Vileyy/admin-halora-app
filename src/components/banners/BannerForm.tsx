@@ -9,9 +9,11 @@ import {
   Image,
   ScrollView,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 import { Banner, CreateBannerData, UpdateBannerData } from "../../types/banner";
 import { pickAndUploadImage } from "../../services/cloudinary";
+import { Ionicons } from "@expo/vector-icons";
 
 interface BannerFormProps {
   banner?: Banner;
@@ -70,88 +72,155 @@ export default function BannerForm({
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        <Text style={styles.title}>
-          {banner ? "Chỉnh sửa banner" : "Thêm banner mới"}
-        </Text>
-
         <View style={styles.form}>
+          {/* Title Input */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Tiêu đề banner *</Text>
-            <TextInput
-              style={styles.input}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Nhập tiêu đề banner"
-              placeholderTextColor="#8F9BB3"
-            />
+            <Text style={styles.label}>Tiêu đề banner</Text>
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="text-outline"
+                size={20}
+                color="#6B7280"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Nhập tiêu đề banner"
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
           </View>
 
+          {/* Link Input */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Link (tùy chọn)</Text>
-            <TextInput
-              style={styles.input}
-              value={linkUrl}
-              onChangeText={setLinkUrl}
-              placeholder="Nhập link (không bắt buộc)"
-              placeholderTextColor="#8F9BB3"
-              keyboardType="url"
-            />
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="link-outline"
+                size={20}
+                color="#6B7280"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                value={linkUrl}
+                onChangeText={setLinkUrl}
+                placeholder="Nhập link (không bắt buộc)"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="url"
+                autoCapitalize="none"
+              />
+            </View>
           </View>
 
+          {/* Image Upload */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Hình ảnh *</Text>
+            <Text style={styles.label}>Hình ảnh banner</Text>
             <TouchableOpacity
               style={styles.imageUpload}
               onPress={handleImageUpload}
               disabled={uploading}
+              activeOpacity={0.8}
             >
               {imageUrl ? (
-                <Image source={{ uri: imageUrl }} style={styles.previewImage} />
+                <>
+                  <Image
+                    source={{ uri: imageUrl }}
+                    style={styles.previewImage}
+                  />
+                  <View style={styles.imageOverlay}>
+                    <View style={styles.changeImageButton}>
+                      <Ionicons name="camera" size={20} color="#FFFFFF" />
+                      <Text style={styles.changeImageText}>Đổi ảnh</Text>
+                    </View>
+                  </View>
+                </>
               ) : (
                 <View style={styles.uploadPlaceholder}>
-                  <Text style={styles.uploadText}>
-                    {uploading ? "Đang tải lên..." : "Chọn hình ảnh"}
-                  </Text>
+                  {uploading ? (
+                    <>
+                      <ActivityIndicator size="large" color="#F59E0B" />
+                      <Text style={styles.uploadingText}>Đang tải lên...</Text>
+                    </>
+                  ) : (
+                    <>
+                      <View style={styles.uploadIconContainer}>
+                        <Ionicons
+                          name="cloud-upload-outline"
+                          size={48}
+                          color="#F59E0B"
+                        />
+                      </View>
+                      <Text style={styles.uploadText}>Chọn hình ảnh</Text>
+                      <Text style={styles.uploadSubtext}>
+                        Nhấn để chọn ảnh từ thiết bị
+                      </Text>
+                    </>
+                  )}
                 </View>
               )}
             </TouchableOpacity>
           </View>
 
+          {/* Active Status Switch */}
           <View style={styles.inputGroup}>
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Trạng thái hoạt động</Text>
+              <View style={styles.switchLabel}>
+                <Ionicons name="power-outline" size={20} color="#6B7280" />
+                <Text style={styles.label}>Trạng thái hoạt động</Text>
+              </View>
               <Switch
                 value={isActive}
                 onValueChange={setIsActive}
-                trackColor={{ false: "#E4E6EA", true: "#6C5CE7" }}
-                thumbColor={isActive ? "#fff" : "#8F9BB3"}
+                trackColor={{ false: "#E5E7EB", true: "#F59E0B" }}
+                thumbColor="#FFFFFF"
               />
             </View>
             <Text style={styles.switchDescription}>
               {isActive
                 ? "Banner sẽ hiển thị trên ứng dụng"
-                : "Banner sẽ bị ẩn"}
+                : "Banner sẽ bị ẩn khỏi ứng dụng"}
             </Text>
           </View>
         </View>
 
+        {/* Action Buttons */}
         <View style={styles.actions}>
           <TouchableOpacity
             style={[styles.button, styles.cancelButton]}
             onPress={onCancel}
             disabled={loading}
+            activeOpacity={0.8}
           >
+            <Ionicons name="close-outline" size={20} color="#6B7280" />
             <Text style={styles.cancelButtonText}>Hủy</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.button, styles.submitButton]}
+            style={[
+              styles.button,
+              styles.submitButton,
+              (loading || uploading) && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={loading || uploading}
+            activeOpacity={0.8}
           >
-            <Text style={styles.submitButtonText}>
-              {loading ? "Đang xử lý..." : banner ? "Cập nhật" : "Tạo mới"}
-            </Text>
+            {loading ? (
+              <>
+                <ActivityIndicator size="small" color="#FFFFFF" />
+                <Text style={styles.submitButtonText}>Đang xử lý...</Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="checkmark-outline" size={20} color="#FFFFFF" />
+                <Text style={styles.submitButtonText}>
+                  {banner ? "Cập nhật" : "Tạo mới"}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -162,75 +231,121 @@ export default function BannerForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F8FAFC",
   },
   content: {
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#2E3A59",
-    marginBottom: 24,
-    textAlign: "center",
-  },
   form: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#2E3A59",
-    marginBottom: 8,
+    color: "#374151",
+    marginBottom: 10,
   },
-  input: {
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: "#E4E6EA",
+    borderColor: "#E5E7EB",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 14,
     fontSize: 16,
-    color: "#2E3A59",
-    backgroundColor: "#F7F9FC",
+    color: "#1F2937",
   },
   imageUpload: {
     borderWidth: 2,
-    borderColor: "#E4E6EA",
+    borderColor: "#D1D5DB",
     borderStyle: "dashed",
-    borderRadius: 12,
-    height: 120,
+    borderRadius: 16,
+    height: 200,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F9FAFB",
+    overflow: "hidden",
   },
   previewImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 10,
     resizeMode: "cover",
+  },
+  imageOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    opacity: 0.8,
+  },
+  changeImageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F59E0B",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 8,
+  },
+  changeImageText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   uploadPlaceholder: {
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
+  },
+  uploadIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#FEF3C7",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
   },
   uploadText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 4,
+  },
+  uploadSubtext: {
     fontSize: 14,
-    color: "#8F9BB3",
-    textAlign: "center",
+    color: "#9CA3AF",
+  },
+  uploadingText: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 12,
   },
   switchContainer: {
     flexDirection: "row",
@@ -238,36 +353,59 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 8,
   },
+  switchLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   switchDescription: {
-    fontSize: 12,
-    color: "#8F9BB3",
+    fontSize: 13,
+    color: "#6B7280",
+    lineHeight: 18,
   },
   actions: {
     flexDirection: "row",
     gap: 12,
+    paddingHorizontal: 20,
   },
   button: {
     flex: 1,
-    paddingVertical: 16,
+    flexDirection: "row",
+    paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   cancelButton: {
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F3F4F6",
     borderWidth: 1,
-    borderColor: "#E4E6EA",
+    borderColor: "#E5E7EB",
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#8F9BB3",
+    color: "#6B7280",
   },
   submitButton: {
-    backgroundColor: "#6C5CE7",
+    backgroundColor: "#F59E0B",
+    shadowColor: "#F59E0B",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitButtonDisabled: {
+    backgroundColor: "#9CA3AF",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
+    color: "#FFFFFF",
   },
 });

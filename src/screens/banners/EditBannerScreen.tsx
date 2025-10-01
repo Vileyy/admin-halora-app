@@ -14,7 +14,7 @@ import { RootState, AppDispatch } from "../../redux/store";
 import { updateBanner, clearError } from "../../redux/slices/bannerSlice";
 import { Banner, UpdateBannerData } from "../../types/banner";
 import { BannerForm } from "../../components/banners";
-import { ArrowLeftIcon } from "../../components/common/icons";
+import { Ionicons } from "@expo/vector-icons";
 
 interface RouteParams {
   banner: Banner;
@@ -55,15 +55,16 @@ export default function EditBannerScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
         >
-          <ArrowLeftIcon size={24} color="#2E3A59" />
+          <Ionicons name="arrow-back" size={24} color="#1F2937" />
         </TouchableOpacity>
 
         <Text style={styles.title}>Chỉnh sửa banner</Text>
@@ -87,30 +88,22 @@ export default function EditBannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F8FAFC",
   },
   header: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#E4E6EA",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderBottomColor: "#F3F4F6",
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F7F9FC",
+    borderRadius: 12,
+    backgroundColor: "#F9FAFB",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -118,7 +111,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#2E3A59",
+    color: "#1F2937",
     flex: 1,
   },
   placeholder: {

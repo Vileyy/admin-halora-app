@@ -7,9 +7,14 @@ import {
   Image,
   Alert,
   Switch,
+  Dimensions,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Banner } from "../../types/banner";
-import { EditIcon, TrashIcon } from "../common/icons";
+import { Ionicons } from "@expo/vector-icons";
+
+const { width } = Dimensions.get("window");
+const CARD_WIDTH = (width - 48) / 2; // 2 columns with padding
 
 interface BannerCardProps {
   banner: Banner;
@@ -47,138 +52,212 @@ export default function BannerCard({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: banner.imageUrl }} style={styles.image} />
-        <View style={styles.statusBadge}>
-          <Text
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.9}
+      onPress={() => onEdit(banner)}
+    >
+      <View style={styles.card}>
+        {/* Image Section */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: banner.imageUrl }} style={styles.image} />
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.7)"]}
+            style={styles.gradient}
+          />
+          {/* Status Badge */}
+          <View
             style={[
-              styles.statusText,
-              { color: banner.isActive ? "#00B894" : "#8F9BB3" },
+              styles.statusBadge,
+              banner.isActive ? styles.statusActive : styles.statusInactive,
             ]}
           >
-            {banner.isActive ? "Hoạt động" : "Tạm dừng"}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={2}>
-          {banner.title}
-        </Text>
-        {banner.linkUrl ? (
-          <Text style={styles.linkUrl} numberOfLines={1}>
-            Link: {banner.linkUrl}
-          </Text>
-        ) : (
-          <Text style={styles.noLink}>Không có link</Text>
-        )}
-      </View>
-
-      <View style={styles.actions}>
-        <View style={styles.toggleContainer}>
-          <Switch
-            value={banner.isActive}
-            onValueChange={handleToggleActive}
-            trackColor={{ false: "#E4E6EA", true: "#6C5CE7" }}
-            thumbColor={banner.isActive ? "#fff" : "#8F9BB3"}
-          />
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: banner.isActive ? "#10B981" : "#9CA3AF" },
+              ]}
+            />
+            <Text style={styles.statusText}>
+              {banner.isActive ? "Hoạt động" : "Tạm dừng"}
+            </Text>
+          </View>
         </View>
 
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editButton]}
-          onPress={() => onEdit(banner)}
-        >
-          <EditIcon size={16} color="#6C5CE7" />
-        </TouchableOpacity>
+        {/* Content Section */}
+        <View style={styles.content}>
+          <Text style={styles.title} numberOfLines={2}>
+            {banner.title}
+          </Text>
+          {banner.linkUrl ? (
+            <View style={styles.linkContainer}>
+              <Ionicons name="link-outline" size={12} color="#F59E0B" />
+              <Text style={styles.linkUrl} numberOfLines={1}>
+                Link
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.noLink}>Không có link</Text>
+          )}
+        </View>
 
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={handleDelete}
-        >
-          <TrashIcon size={16} color="#FF6B6B" />
-        </TouchableOpacity>
+        {/* Action Section */}
+        <View style={styles.actions}>
+          <View style={styles.toggleContainer}>
+            <Switch
+              value={banner.isActive}
+              onValueChange={handleToggleActive}
+              trackColor={{ false: "#E5E7EB", true: "#F59E0B" }}
+              thumbColor="#FFFFFF"
+              style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+            />
+          </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
+              onPress={(e) => {
+                e.stopPropagation();
+                onEdit(banner);
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="create-outline" size={16} color="#F59E0B" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.deleteButton]}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="trash-outline" size={16} color="#EF4444" />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    width: CARD_WIDTH,
+    marginBottom: 16,
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   imageContainer: {
+    width: "100%",
+    height: 120,
     position: "relative",
-    marginBottom: 12,
   },
   image: {
     width: "100%",
-    height: 120,
-    borderRadius: 8,
+    height: "100%",
     resizeMode: "cover",
+  },
+  gradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 50,
   },
   statusBadge: {
     position: "absolute",
     top: 8,
     right: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    gap: 4,
+  },
+  statusActive: {
+    backgroundColor: "rgba(236, 253, 245, 0.95)",
+  },
+  statusInactive: {
+    backgroundColor: "rgba(243, 244, 246, 0.95)",
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
+    color: "#374151",
   },
   content: {
-    marginBottom: 12,
+    padding: 12,
+    paddingBottom: 8,
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    color: "#2E3A59",
-    marginBottom: 4,
+    color: "#1F2937",
+    marginBottom: 6,
+    minHeight: 36,
+  },
+  linkContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   linkUrl: {
     fontSize: 12,
-    color: "#6C5CE7",
+    color: "#F59E0B",
+    fontWeight: "500",
   },
   noLink: {
     fontSize: 12,
-    color: "#8F9BB3",
+    color: "#9CA3AF",
     fontStyle: "italic",
   },
   actions: {
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 12,
+    paddingBottom: 12,
     justifyContent: "space-between",
   },
   toggleContainer: {
-    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: 6,
   },
   actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
+    borderWidth: 1,
   },
   editButton: {
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#FEF3C7",
+    borderColor: "#FDE68A",
   },
   deleteButton: {
-    backgroundColor: "#FFF5F5",
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FEE2E2",
   },
 });

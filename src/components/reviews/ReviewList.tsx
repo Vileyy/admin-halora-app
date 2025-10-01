@@ -10,6 +10,7 @@ import {
 import { Review, ReviewStats } from "../../types/review";
 import ReviewCard from "./ReviewCard";
 import ReviewStatsComponent from "./ReviewStats";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ReviewListProps {
   reviews: Review[];
@@ -44,7 +45,9 @@ const ReviewList: React.FC<ReviewListProps> = ({
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyIcon}>📝</Text>
+      <View style={styles.emptyIconContainer}>
+        <Ionicons name="chatbubbles-outline" size={64} color="#D1D5DB" />
+      </View>
       <Text style={styles.emptyTitle}>Chưa có đánh giá nào</Text>
       <Text style={styles.emptyText}>
         {hasActiveFilters
@@ -65,44 +68,21 @@ const ReviewList: React.FC<ReviewListProps> = ({
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       {/* Stats Section */}
-      {stats && (
-        <View style={styles.statsSection}>
-          <ReviewStatsComponent stats={stats} />
-        </View>
-      )}
+      {stats && <ReviewStatsComponent stats={stats} />}
 
-      {/* Filter Section */}
-      <View style={styles.filterSection}>
-        <View style={styles.filterHeader}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.filterTitle}>Danh sách đánh giá</Text>
-            <View style={styles.countBadge}>
-              <Text style={styles.countText}>{reviews.length}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.filterButton} onPress={onFilterPress}>
-            <Text style={styles.filterButtonText}>🔍</Text>
-            {hasActiveFilters && <View style={styles.filterIndicator} />}
+      {/* Active Filter Badge */}
+      {hasActiveFilters && (
+        <View style={styles.activeFilterBadge}>
+          <Ionicons name="funnel" size={14} color="#F59E0B" />
+          <Text style={styles.activeFilterText}>Bộ lọc đang hoạt động</Text>
+          <TouchableOpacity
+            onPress={onClearFilters}
+            style={styles.clearFilterButton}
+          >
+            <Ionicons name="close-circle" size={16} color="#EF4444" />
           </TouchableOpacity>
         </View>
-
-        {hasActiveFilters && (
-          <View style={styles.activeFiltersContainer}>
-            <View style={styles.activeFiltersInfo}>
-              <Text style={styles.activeFiltersIcon}>🔽</Text>
-              <Text style={styles.activeFiltersText}>
-                Bộ lọc đang hoạt động
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.clearFiltersButton}
-              onPress={onClearFilters}
-            >
-              <Text style={styles.clearFiltersText}>Xóa</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+      )}
     </View>
   );
 
@@ -132,10 +112,8 @@ const ReviewList: React.FC<ReviewListProps> = ({
         <RefreshControl
           refreshing={loading}
           onRefresh={onRefresh}
-          colors={["#6C5CE7"]}
-          tintColor="#6C5CE7"
-          title="Đang tải đánh giá..."
-          titleColor="#6C5CE7"
+          colors={["#F59E0B"]}
+          tintColor="#F59E0B"
         />
       }
       showsVerticalScrollIndicator={false}
@@ -166,160 +144,68 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: "#F8FAFC",
   },
-  statsSection: {
-    marginBottom: 8,
-  },
-  filterSection: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
+  activeFilterBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF3C7",
     marginHorizontal: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: "#6C5CE7",
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: "rgba(108, 92, 231, 0.1)",
-  },
-  filterHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  filterTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#2E3A59",
-    marginRight: 12,
-  },
-  countBadge: {
-    backgroundColor: "#6C5CE7",
+    marginBottom: 12,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    shadowColor: "#6C5CE7",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
   },
-  countText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  filterButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#F7F9FC",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-    borderWidth: 2,
-    borderColor: "#E4E7EB",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  filterButtonText: {
-    fontSize: 18,
-  },
-  filterIndicator: {
-    position: "absolute",
-    top: -2,
-    right: -2,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#FF4757",
-    borderWidth: 2,
-    borderColor: "#fff",
-    shadowColor: "#FF4757",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  activeFiltersContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#F1F3F4",
-  },
-  activeFiltersInfo: {
-    flexDirection: "row",
-    alignItems: "center",
+  activeFilterText: {
     flex: 1,
-  },
-  activeFiltersIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  activeFiltersText: {
-    fontSize: 15,
-    color: "#8F9BB3",
+    fontSize: 14,
+    color: "#D97706",
     fontWeight: "600",
   },
-  clearFiltersButton: {
-    backgroundColor: "#FF4757",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  clearFiltersText: {
-    fontSize: 14,
-    color: "#fff",
-    fontWeight: "700",
+  clearFilterButton: {
+    padding: 2,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#2E3A59",
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#6B7280",
     marginBottom: 8,
     textAlign: "center",
   },
   emptyText: {
-    fontSize: 16,
-    color: "#8F9BB3",
+    fontSize: 14,
+    color: "#9CA3AF",
     textAlign: "center",
-    lineHeight: 24,
+    lineHeight: 20,
     marginBottom: 24,
+  },
+  clearFiltersButton: {
+    backgroundColor: "#EF4444",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  clearFiltersText: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   footerContainer: {
     alignItems: "center",
@@ -327,8 +213,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   footerText: {
-    fontSize: 14,
-    color: "#8F9BB3",
+    fontSize: 13,
+    color: "#9CA3AF",
     fontWeight: "500",
   },
 });

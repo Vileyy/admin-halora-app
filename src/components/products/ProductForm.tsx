@@ -28,7 +28,7 @@ interface ProductFormProps {
   onSubmit: (productData: any) => Promise<void>;
   isLoading?: boolean;
   submitButtonText?: string;
-  useInventorySelection?: boolean; // Mới: chế độ chọn từ kho
+  useInventorySelection?: boolean; 
 }
 
 interface FormVariant {
@@ -36,7 +36,7 @@ interface FormVariant {
   price: string;
   stock: string;
   sku?: string;
-  variantId?: string; // ID của variant từ kho
+  variantId?: string; 
 }
 
 interface FormData {
@@ -47,8 +47,8 @@ interface FormData {
   imageUrl: string;
   variants: FormVariant[];
   isFlashDeal: boolean;
-  selectedInventoryId?: string; // ID sản phẩm từ kho
-  originalProductId?: string; // Tham chiếu đến sản phẩm gốc trong kho
+  selectedInventoryId?: string; 
+  originalProductId?: string; 
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -63,7 +63,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     (state: RootState) => state.inventory
   );
   const { brands, loading: brandsLoading } = useSelector(
-    (state: RootState) => state.brands
+    (state: RootState) => state.brands 
   );
   const { flashDeals, newProducts } = useSelector(
     (state: RootState) => state.products

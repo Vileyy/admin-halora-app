@@ -18,7 +18,7 @@ import {
 } from "../../redux/slices/brandSlice";
 import { Brand } from "../../types/brand";
 import { BrandList } from "../../components/brands";
-import { PlusIcon, ArrowLeftIcon } from "../../components/common/icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function BrandsScreen() {
   const navigation = useNavigation();
@@ -64,25 +64,35 @@ export default function BrandsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <ArrowLeftIcon size={24} color="#2E3A59" />
-        </TouchableOpacity>
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color="#1F2937" />
+          </TouchableOpacity>
 
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Quản lý thương hiệu</Text>
-          <Text style={styles.subtitle}>{brands.length} thương hiệu</Text>
+          <View style={styles.headerContent}>
+            <Text style={styles.title}>Thương hiệu</Text>
+            <View style={styles.brandCount}>
+              <Ionicons name="briefcase-outline" size={14} color="#6B7280" />
+              <Text style={styles.subtitle}>{brands.length} thương hiệu</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleAddBrand}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.addButton} onPress={handleAddBrand}>
-          <PlusIcon size={20} color="#fff" />
-        </TouchableOpacity>
       </View>
 
       {/* Content */}
@@ -102,30 +112,25 @@ export default function BrandsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F9FC",
+    backgroundColor: "#F8FAFC",
   },
   header: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  headerTop: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E4E6EA",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingTop: 16,
   },
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F7F9FC",
+    borderRadius: 12,
+    backgroundColor: "#F9FAFB",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -134,23 +139,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
-    color: "#2E3A59",
-    marginBottom: 2,
+    color: "#1F2937",
+    marginBottom: 4,
+  },
+  brandCount: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   subtitle: {
     fontSize: 14,
-    color: "#8F9BB3",
+    color: "#6B7280",
+    fontWeight: "500",
   },
   addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#6C5CE7",
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#8B5CF6",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#6C5CE7",
+    shadowColor: "#8B5CF6",
     shadowOffset: {
       width: 0,
       height: 4,

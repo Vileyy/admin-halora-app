@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { Brand } from "../../types/brand";
 import BrandCard from "./BrandCard";
+import { Ionicons } from "@expo/vector-icons";
 
 interface BrandListProps {
   brands: Brand[];
@@ -24,9 +25,12 @@ export default function BrandList({
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
+      <View style={styles.emptyIconContainer}>
+        <Ionicons name="briefcase-outline" size={64} color="#D1D5DB" />
+      </View>
       <Text style={styles.emptyText}>Chưa có thương hiệu nào</Text>
       <Text style={styles.emptySubtext}>
-        Nhấn nút "+" để thêm thương hiệu mới
+        Nhấn nút "+" ở góc trên để thêm thương hiệu mới
       </Text>
     </View>
   );
@@ -37,14 +41,16 @@ export default function BrandList({
         data={brands}
         renderItem={renderBrand}
         keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={loading}
             onRefresh={onRefresh}
-            colors={["#6C5CE7"]}
-            tintColor="#6C5CE7"
+            colors={["#8B5CF6"]}
+            tintColor="#8B5CF6"
           />
         }
         ListEmptyComponent={renderEmpty}
@@ -61,21 +67,36 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 100,
   },
+  row: {
+    justifyContent: "space-between",
+  },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
   },
   emptyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#8F9BB3",
+    color: "#6B7280",
     marginBottom: 8,
+    textAlign: "center",
   },
   emptySubtext: {
     fontSize: 14,
-    color: "#8F9BB3",
+    color: "#9CA3AF",
     textAlign: "center",
+    lineHeight: 20,
   },
 });

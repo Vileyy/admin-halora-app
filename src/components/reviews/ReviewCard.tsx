@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import { Review } from "../../types/review";
-import { TrashIcon, StarIcon, UserIcon } from "../common/icons";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ReviewCardProps {
   review: Review;
@@ -60,13 +60,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     }
   };
 
-  const renderStars = (rating: number, size: number = 16) => {
+  const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
-      <StarIcon
+      <Ionicons
         key={index}
-        size={size}
-        color={index < rating ? "#FFD700" : "#E4E6EA"}
-        filled={index < rating}
+        name={index < rating ? "star" : "star-outline"}
+        size={16}
+        color={index < rating ? "#F59E0B" : "#D1D5DB"}
       />
     ));
   };
@@ -102,27 +102,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </View>
         </View>
 
-        <View style={styles.headerActions}>
-          <View
-            style={[
-              styles.ratingBadge,
-              { backgroundColor: getRatingColor(review.rating) + "20" },
-            ]}
-          >
-            <StarIcon size={12} color={getRatingColor(review.rating)} filled />
-            <Text
-              style={[
-                styles.ratingText,
-                { color: getRatingColor(review.rating) },
-              ]}
-            >
-              {review.rating}/5
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <TrashIcon size={16} color="#FF6B6B" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDelete}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="trash-outline" size={20} color="#EF4444" />
+        </TouchableOpacity>
       </View>
 
       {/* Product Section */}
@@ -139,76 +125,68 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           <Text style={styles.productName} numberOfLines={2}>
             {review.productName}
           </Text>
-          <Text style={styles.orderId}>Đơn hàng: {review.orderId}</Text>
-          <View style={styles.productActions}>
-            <Text style={styles.viewProductText}>Xem sản phẩm →</Text>
+          <View style={styles.orderInfo}>
+            <Ionicons name="receipt-outline" size={12} color="#6B7280" />
+            <Text style={styles.orderId}>{review.orderId}</Text>
           </View>
         </View>
+        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
       </TouchableOpacity>
 
-      {/* Ratings Detail */}
-      <View style={styles.ratingsDetail}>
-        <View style={styles.ratingItem}>
-          <View style={styles.ratingHeader}>
-            <Text style={styles.ratingLabel}>Chất lượng sản phẩm</Text>
-            <Text
-              style={[
-                styles.ratingStatus,
-                { color: getRatingColor(review.rating) },
-              ]}
-            >
-              {getRatingText(review.rating)}
-            </Text>
+      {/* Ratings */}
+      <View style={styles.ratingsSection}>
+        <View style={styles.ratingRow}>
+          <View style={styles.ratingLabel}>
+            <Ionicons name="cube-outline" size={16} color="#6B7280" />
+            <Text style={styles.ratingLabelText}>Sản phẩm</Text>
           </View>
-          <View style={styles.starsRow}>
-            <View style={styles.starsContainer}>
-              {renderStars(review.rating, 18)}
-            </View>
-            <Text style={styles.ratingValue}>({review.rating}/5)</Text>
+          <View style={styles.ratingStars}>
+            {renderStars(review.rating)}
+            <Text style={styles.ratingValue}>{review.rating.toFixed(1)}</Text>
           </View>
         </View>
 
-        <View style={styles.ratingItem}>
-          <View style={styles.ratingHeader}>
-            <Text style={styles.ratingLabel}>Dịch vụ vận chuyển</Text>
-            <Text
-              style={[
-                styles.ratingStatus,
-                { color: getRatingColor(review.shippingRating) },
-              ]}
-            >
-              {getRatingText(review.shippingRating)}
-            </Text>
+        <View style={styles.ratingRow}>
+          <View style={styles.ratingLabel}>
+            <Ionicons name="car-outline" size={16} color="#6B7280" />
+            <Text style={styles.ratingLabelText}>Vận chuyển</Text>
           </View>
-          <View style={styles.starsRow}>
-            <View style={styles.starsContainer}>
-              {renderStars(review.shippingRating, 18)}
-            </View>
-            <Text style={styles.ratingValue}>({review.shippingRating}/5)</Text>
+          <View style={styles.ratingStars}>
+            {renderStars(review.shippingRating)}
+            <Text style={styles.ratingValue}>
+              {review.shippingRating.toFixed(1)}
+            </Text>
           </View>
         </View>
       </View>
 
       {/* Comment */}
-      <View style={styles.commentSection}>
-        <Text style={styles.commentText}>"{review.comment}"</Text>
-      </View>
+      {review.comment && (
+        <View style={styles.commentSection}>
+          <View style={styles.commentHeader}>
+            <Ionicons name="chatbox-outline" size={16} color="#6B7280" />
+            <Text style={styles.commentHeaderText}>Nhận xét</Text>
+          </View>
+          <Text style={styles.commentText}>{review.comment}</Text>
+        </View>
+      )}
 
       {/* Footer */}
       <View style={styles.footer}>
-        <View style={styles.footerLeft}>
-          <Text style={styles.footerText}>
-            {review.createdAt !== review.updatedAt ? "Đã chỉnh sửa" : ""}
-          </Text>
-        </View>
-        <View style={styles.footerRight}>
-          <Text style={styles.timeText}>
-            {new Date(review.createdAt).toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
-        </View>
+        <Text style={styles.timeText}>
+          {new Date(review.createdAt).toLocaleString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
+        </Text>
+        {review.createdAt !== review.updatedAt && (
+          <View style={styles.editedBadge}>
+            <Text style={styles.editedText}>Đã chỉnh sửa</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -216,27 +194,27 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
     marginHorizontal: 16,
-    shadowColor: "#6C5CE7",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 2,
     },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
     borderWidth: 1,
-    borderColor: "rgba(108, 92, 231, 0.08)",
+    borderColor: "#F3F4F6",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
+    alignItems: "center",
+    marginBottom: 16,
   },
   userSection: {
     flexDirection: "row",
@@ -244,235 +222,159 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#6C5CE7",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F59E0B",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
-    shadowColor: "#6C5CE7",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
+    marginRight: 12,
   },
   avatarText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
   userInfo: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#2E3A59",
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1F2937",
+    marginBottom: 2,
   },
   reviewDate: {
-    fontSize: 14,
-    color: "#8F9BB3",
-    fontWeight: "600",
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  ratingBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 6,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  ratingText: {
     fontSize: 13,
-    fontWeight: "800",
+    color: "#6B7280",
+    fontWeight: "500",
   },
   deleteButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#FFF5F5",
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: "#FEF2F2",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#FFE5E5",
-    shadowColor: "#FF6B6B",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: "#FEE2E2",
   },
   productSection: {
     flexDirection: "row",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#E4E7EB",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    borderColor: "#F3F4F6",
   },
   productImage: {
-    width: 88,
-    height: 88,
-    borderRadius: 16,
-    marginRight: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: "#F3F4F6",
   },
   productInfo: {
     flex: 1,
-    justifyContent: "space-between",
   },
   productName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2E3A59",
-    lineHeight: 24,
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1F2937",
+    lineHeight: 20,
     marginBottom: 6,
   },
+  orderInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
   orderId: {
-    fontSize: 14,
-    color: "#8F9BB3",
-    marginBottom: 10,
-    fontWeight: "600",
+    fontSize: 12,
+    color: "#6B7280",
+    fontWeight: "500",
   },
-  productActions: {
-    alignSelf: "flex-start",
-  },
-  viewProductText: {
-    fontSize: 14,
-    color: "#6C5CE7",
-    fontWeight: "700",
-  },
-  ratingsDetail: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    gap: 16,
-    borderWidth: 1,
-    borderColor: "#E4E7EB",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  ratingItem: {
+  ratingsSection: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
     gap: 10,
   },
-  ratingHeader: {
+  ratingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   ratingLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#2E3A59",
-  },
-  ratingStatus: {
-    fontSize: 14,
-    fontWeight: "800",
-  },
-  starsRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 6,
+    flex: 1,
   },
-  starsContainer: {
+  ratingLabelText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#6B7280",
+  },
+  ratingStars: {
     flexDirection: "row",
-    gap: 2,
+    alignItems: "center",
+    gap: 6,
   },
   ratingValue: {
-    fontSize: 13,
-    color: "#8F9BB3",
+    fontSize: 14,
+    color: "#1F2937",
     fontWeight: "600",
+    marginLeft: 4,
   },
   commentSection: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 5,
-    borderLeftColor: "#6C5CE7",
-    borderWidth: 1,
-    borderColor: "#E4E7EB",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  commentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  commentHeaderText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#6B7280",
   },
   commentText: {
-    fontSize: 16,
-    color: "#2E3A59",
-    lineHeight: 26,
-    fontStyle: "italic",
-    fontWeight: "500",
+    fontSize: 14,
+    color: "#374151",
+    lineHeight: 20,
   },
   footer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 16,
+    paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#E4E7EB",
+    borderTopColor: "#F3F4F6",
   },
-  footerLeft: {
-    flex: 1,
-  },
-  footerText: {
-    fontSize: 13,
-    color: "#8F9BB3",
-    fontStyle: "italic",
-    fontWeight: "600",
-  },
-  footerRight: {},
   timeText: {
-    fontSize: 13,
-    color: "#8F9BB3",
-    fontWeight: "700",
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontWeight: "500",
+  },
+  editedBadge: {
+    backgroundColor: "#FEF3C7",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  editedText: {
+    fontSize: 11,
+    color: "#D97706",
+    fontWeight: "600",
   },
 });
 

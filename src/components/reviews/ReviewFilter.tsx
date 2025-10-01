@@ -12,12 +12,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ReviewFilters } from "../../types/review";
-import {
-  ArrowLeftIcon,
-  FilterIcon,
-  CalendarIcon,
-  SearchIcon,
-} from "../common/icons";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ReviewFilterProps {
   visible: boolean;
@@ -175,7 +170,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
           style={styles.header}
         >
           <TouchableOpacity style={styles.backButton} onPress={onClose}>
-            <ArrowLeftIcon size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
 
           <View style={styles.headerContent}>
@@ -352,7 +347,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
               <View style={styles.dateInputContainer}>
                 <Text style={styles.inputLabel}>Từ ngày</Text>
                 <View style={styles.dateInputWrapper}>
-                  <CalendarIcon size={20} color="#6C5CE7" />
+                  <Ionicons name="calendar-outline" size={20} color="#6C5CE7" />
                   <TextInput
                     style={styles.dateInput}
                     placeholder="YYYY-MM-DD"
@@ -372,7 +367,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
               <View style={styles.dateInputContainer}>
                 <Text style={styles.inputLabel}>Đến ngày</Text>
                 <View style={styles.dateInputWrapper}>
-                  <CalendarIcon size={20} color="#6C5CE7" />
+                  <Ionicons name="calendar-outline" size={20} color="#6C5CE7" />
                   <TextInput
                     style={styles.dateInput}
                     placeholder="YYYY-MM-DD"
@@ -394,7 +389,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
             <View style={styles.searchCard}>
               <Text style={styles.inputLabel}>Mã sản phẩm</Text>
               <View style={styles.searchInputWrapper}>
-                <SearchIcon size={20} color="#6C5CE7" />
+                <Ionicons name="search-outline" size={20} color="#6C5CE7" />
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Nhập mã sản phẩm..."
@@ -410,7 +405,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
             <View style={styles.searchCard}>
               <Text style={styles.inputLabel}>Mã khách hàng</Text>
               <View style={styles.searchInputWrapper}>
-                <SearchIcon size={20} color="#6C5CE7" />
+                <Ionicons name="search-outline" size={20} color="#6C5CE7" />
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Nhập mã khách hàng..."
@@ -443,7 +438,7 @@ const ReviewFilter: React.FC<ReviewFilterProps> = ({
               end={{ x: 1, y: 0 }}
               style={styles.applyButtonGradient}
             >
-              <FilterIcon size={20} color="#fff" />
+              <Ionicons name="funnel" size={20} color="#fff" />
               <Text style={styles.applyButtonText}>
                 Áp dụng{" "}
                 {getActiveFiltersCount() > 0

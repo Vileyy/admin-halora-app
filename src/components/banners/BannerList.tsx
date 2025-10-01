@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { Banner } from "../../types/banner";
 import BannerCard from "./BannerCard";
+import { Ionicons } from "@expo/vector-icons";
 
 interface BannerListProps {
   banners: Banner[];
@@ -31,8 +32,13 @@ export default function BannerList({
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
+      <View style={styles.emptyIconContainer}>
+        <Ionicons name="images-outline" size={64} color="#D1D5DB" />
+      </View>
       <Text style={styles.emptyText}>Chưa có banner nào</Text>
-      <Text style={styles.emptySubtext}>Nhấn nút "+" để thêm banner mới</Text>
+      <Text style={styles.emptySubtext}>
+        Nhấn nút "+" ở góc trên để thêm banner mới
+      </Text>
     </View>
   );
 
@@ -42,14 +48,16 @@ export default function BannerList({
         data={banners}
         renderItem={renderBanner}
         keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={loading}
             onRefresh={onRefresh}
-            colors={["#6C5CE7"]}
-            tintColor="#6C5CE7"
+            colors={["#F59E0B"]}
+            tintColor="#F59E0B"
           />
         }
         ListEmptyComponent={renderEmpty}
@@ -66,21 +74,36 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 100,
   },
+  row: {
+    justifyContent: "space-between",
+  },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
   },
   emptyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#8F9BB3",
+    color: "#6B7280",
     marginBottom: 8,
+    textAlign: "center",
   },
   emptySubtext: {
     fontSize: 14,
-    color: "#8F9BB3",
+    color: "#9CA3AF",
     textAlign: "center",
+    lineHeight: 20,
   },
 });
