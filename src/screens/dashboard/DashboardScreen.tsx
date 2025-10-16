@@ -84,6 +84,9 @@ export default function DashboardScreen() {
       case "warehouse":
         (navigation as any).navigate("Inventory");
         break;
+      case "documents":
+        (navigation as any).navigate("Documents");
+        break;
       default:
         console.log("Navigate to:", menuId, submenuId || "");
         break;
@@ -138,6 +141,12 @@ export default function DashboardScreen() {
       title: "Quản lý kho",
       icon: <BoxIcon size={24} color="#fff" />,
       color: "#636E72",
+    },
+    {
+      id: "documents",
+      title: "Quản lý tài liệu",
+      icon: <DocumentIcon size={24} color="#fff" />,
+      color: "#74B9FF",
     },
   ];
 

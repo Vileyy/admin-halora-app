@@ -305,4 +305,28 @@ export class HaloraDatabaseService {
   static async deleteVoucher(voucherId: string) {
     return DatabaseService.deleteData(`vouchers/${voucherId}`);
   }
+
+  // Documents
+  static async getDocuments() {
+    return DatabaseService.readData("documents");
+  }
+
+  static async addDocument(document: any) {
+    return DatabaseService.writeData(`documents/${document.id}`, {
+      ...document,
+      uploadedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  }
+
+  static async updateDocument(documentId: string, updates: any) {
+    return DatabaseService.updateData(`documents/${documentId}`, {
+      ...updates,
+      updatedAt: Date.now(),
+    });
+  }
+
+  static async deleteDocument(documentId: string) {
+    return DatabaseService.deleteData(`documents/${documentId}`);
+  }
 }

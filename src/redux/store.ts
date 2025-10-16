@@ -10,6 +10,7 @@ import revenueReducer from "./slices/revenueSlice";
 import voucherReducer from "./slices/voucherSlice";
 import userReducer from "./slices/userSlice";
 import orderReducer from "./slices/orderSlice";
+import documentReducer from "./slices/documentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     vouchers: voucherReducer,
     users: userReducer,
     orders: orderReducer,
+    documents: documentReducer,
   },
 });
 

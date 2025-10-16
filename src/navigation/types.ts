@@ -32,4 +32,5 @@ export type RootStackParamList = {
   Revenue: undefined;
   Vouchers: undefined;
   AddVoucher: { type?: "shipping" | "product" };
+  Documents: undefined;
 };
