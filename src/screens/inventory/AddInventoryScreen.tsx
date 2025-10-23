@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import { addInventory } from "../../redux/slices/inventorySlice";
+import { fetchBrands } from "../../redux/slices/brandSlice";
 import { InventoryForm } from "../../components/inventory/InventoryForm";
 import { InventoryItem } from "../../types/inventory";
 
@@ -12,6 +13,10 @@ export default function AddInventoryScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.inventory);
+
+  useEffect(() => {
+    dispatch(fetchBrands());
+  }, [dispatch]);
 
   const handleSubmit = async (
     itemData: Omit<InventoryItem, "id" | "createdAt" | "updatedAt">

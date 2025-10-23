@@ -14,7 +14,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../navigation/AppNavigator";
+import { RootStackParamList } from "../../navigation/types";
+import { AuthService } from "../../services/auth";
+import { DatabaseService } from "../../services/database";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -30,28 +32,87 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Validate email format
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Check user role from Firebase Realtime Database
+  const checkUserRole = async (uid: string) => {
+    try {
+      const result = await DatabaseService.readData(`users/${uid}`);
+
+      if (result.success && result.data) {
+        const user = result.data;
+
+        // Check if user has admin role
+        if (user.role === "admin") {
+          return { isAdmin: true, user };
+        } else {
+          return { isAdmin: false, user };
+        }
+      } else {
+        return { isAdmin: false, user: null };
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error);
+      return { isAdmin: false, user: null };
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
-    if (!email.includes("@")) {
+    if (!validateEmail(email)) {
       Alert.alert("Lỗi", "Email không hợp lệ");
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      if (email === "admin@gmail.com" && password === "admin123") {
+    try {
+      // Sign in with Firebase Authentication
+      const signInResult = await AuthService.signIn(email, password);
+
+      if (!signInResult.success) {
+        setIsLoading(false);
+        Alert.alert("Lỗi", "Email hoặc mật khẩu không đúng");
+        return;
+      }
+
+      // Get the current user's UID
+      const currentUser = AuthService.getCurrentUser();
+
+      if (!currentUser) {
+        setIsLoading(false);
+        Alert.alert("Lỗi", "Không thể lấy thông tin người dùng");
+        return;
+      }
+
+      // Check user role from database
+      const roleResult = await checkUserRole(currentUser.uid);
+
+      if (roleResult.isAdmin) {
+        // User is admin, navigate to main app
+        setIsLoading(false);
         navigation.replace("Main");
       } else {
-        Alert.alert("Lỗi", "Email hoặc mật khẩu không đúng");
+        // User is not admin, sign out and show error
+        await AuthService.signOut();
+        setIsLoading(false);
+        Alert.alert(
+          "Truy cập bị từ chối",
+          "Bạn không có quyền truy cập vào ứng dụng admin. Vui lòng liên hệ với quản trị viên."
+        );
       }
-    }, 1500);
+    } catch (error: any) {
+      setIsLoading(false);
+      Alert.alert("Lỗi", error.message || "Có lỗi xảy ra khi đăng nhập");
+    }
   };
 
   return (

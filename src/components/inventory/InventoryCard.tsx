@@ -10,7 +10,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { InventoryItem } from "../../types/inventory";
-import { fetchBrands, Brand } from "../../services/brandService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { productStockService } from "../../services/productStockService";
 
 interface InventoryCardProps {
   item: InventoryItem;
@@ -23,19 +25,38 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const [brandName, setBrandName] = useState<string>("");
+  const { brands } = useSelector((state: RootState) => state.brands);
+  const [productStock, setProductStock] = useState<{
+    totalStock: number;
+    variants: Array<{
+      size: string;
+      stockQty: number;
+      price: number;
+    }>;
+  } | null>(null);
+  const [loadingStock, setLoadingStock] = useState(true);
+
+  const getBrandName = () => {
+    const brand = brands.find((b) => b.id === item.brandId);
+    return brand?.name || "Chưa có thương hiệu";
+  };
 
   useEffect(() => {
-    loadBrandName();
-  }, [item.brandId]);
+    loadProductStock();
+  }, [item.id]);
 
-  const loadBrandName = async () => {
+  const loadProductStock = async () => {
     try {
-      const brands = await fetchBrands();
-      const brand = brands.find((b) => b.id === item.brandId);
-      setBrandName(brand?.name || "Chưa có thương hiệu");
+      setLoadingStock(true);
+      const stock = await productStockService.getProductStockByInventoryId(
+        item.id
+      );
+      setProductStock(stock);
     } catch (error) {
-      setBrandName("Chưa có thương hiệu");
+      console.error("Error loading product stock:", error);
+      setProductStock(null);
+    } finally {
+      setLoadingStock(false);
     }
   };
   const handleDelete = () => {
@@ -64,10 +85,53 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
   };
 
   const getTotalStock = () => {
+    // Sử dụng tồn kho từ products nếu có, nếu không thì dùng từ inventory
+    if (productStock) {
+      return productStock.totalStock;
+    }
     return item.variants.reduce(
       (total, variant) => total + variant.stockQty,
       0
     );
+  };
+
+  const getStockStatus = () => {
+    const totalStock = getTotalStock();
+    if (totalStock === 0) {
+      return {
+        status: "out",
+        text: "Hết hàng",
+        color: "#FF6B6B",
+        bgColor: "#FFE5E5",
+      };
+    } else if (totalStock <= 5) {
+      return {
+        status: "low",
+        text: "Sắp hết",
+        color: "#FF9500",
+        bgColor: "#FFF4E5",
+      };
+    } else {
+      return {
+        status: "available",
+        text: "Còn hàng",
+        color: "#34C759",
+        bgColor: "#E5F7E5",
+      };
+    }
+  };
+
+  const getStockIcon = (status: string) => {
+    switch (status) {
+      case "out":
+        return "close-circle";
+      case "low":
+        return "warning";
+      case "available":
+        return "checkmark-circle";
+      default:
+        return "help-circle";
+    }
   };
 
   return (
@@ -88,14 +152,29 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
             {item.name}
           </Text>
           <Text style={styles.supplier}>{item.supplier}</Text>
-          <Text style={styles.brand}>{brandName}</Text>
+          <Text style={styles.brand}>{getBrandName()}</Text>
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
           </Text>
           <View style={styles.stockInfo}>
-            <Text style={styles.stockText}>
-              Tổng tồn kho: {getTotalStock()} sản phẩm
-            </Text>
+            <View style={styles.stockStatusContainer}>
+              {loadingStock ? (
+                <Ionicons name="hourglass" size={16} color="#8F9BB3" />
+              ) : (
+                <Ionicons
+                  name={getStockIcon(getStockStatus().status)}
+                  size={16}
+                  color={getStockStatus().color}
+                />
+              )}
+              <Text
+                style={[styles.stockText, { color: getStockStatus().color }]}
+              >
+                {loadingStock
+                  ? "Đang tải..."
+                  : `${getStockStatus().text} - ${getTotalStock()} sản phẩm`}
+              </Text>
+            </View>
           </View>
         </View>
         <View style={styles.actions}>
@@ -117,40 +196,79 @@ export const InventoryCard: React.FC<InventoryCardProps> = ({
       {/* Variants section */}
       {item.variants && item.variants.length > 0 && (
         <View style={styles.variantsSection}>
-          <Text style={styles.variantsTitle}>Biến thể sản phẩm:</Text>
+          <Text style={styles.variantsTitle}>
+            Biến thể sản phẩm{" "}
+            {productStock ? "(Tồn kho thực tế)" : "(Tồn kho ban đầu)"}:
+          </Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.variantsScroll}
           >
-            {item.variants.map((variant, index) => (
-              <View key={variant.id} style={styles.variantCard}>
-                <Text style={styles.variantName}>{variant.name}</Text>
-                <View style={styles.variantInfo}>
-                  <Text style={styles.variantLabel}>Giá nhập:</Text>
-                  <Text style={styles.variantValue}>
-                    {formatCurrency(variant.importPrice)}
-                  </Text>
+            {item.variants.map((variant, index) => {
+              // Tìm tồn kho thực tế từ products
+              const actualStock = productStock?.variants.find(
+                (pv) => pv.size === variant.name
+              );
+              const stockQty = actualStock
+                ? actualStock.stockQty
+                : variant.stockQty;
+              const sellingPrice = actualStock
+                ? actualStock.price
+                : variant.price;
+
+              return (
+                <View key={variant.id} style={styles.variantCard}>
+                  <Text style={styles.variantName}>{variant.name}</Text>
+                  <View style={styles.variantInfo}>
+                    <Text style={styles.variantLabel}>Giá nhập:</Text>
+                    <Text style={styles.variantValue}>
+                      {formatCurrency(variant.importPrice)}
+                    </Text>
+                  </View>
+                  <View style={styles.variantInfo}>
+                    <Text style={styles.variantLabel}>Giá bán:</Text>
+                    <Text style={styles.variantValue}>
+                      {formatCurrency(sellingPrice)}
+                    </Text>
+                  </View>
+                  <View style={styles.variantInfo}>
+                    <Text style={styles.variantLabel}>
+                      {actualStock ? "Tồn kho thực tế:" : "Tồn kho ban đầu:"}
+                    </Text>
+                    <View style={styles.stockValueContainer}>
+                      <Ionicons
+                        name={
+                          stockQty === 0
+                            ? "close-circle"
+                            : stockQty <= 5
+                            ? "warning"
+                            : "checkmark-circle"
+                        }
+                        size={12}
+                        color={
+                          stockQty === 0
+                            ? "#FF6B6B"
+                            : stockQty <= 5
+                            ? "#FF9500"
+                            : "#34C759"
+                        }
+                      />
+                      <Text
+                        style={[
+                          styles.variantValue,
+                          stockQty === 0 && styles.outOfStock,
+                          stockQty > 0 && stockQty <= 5 && styles.lowStock,
+                          stockQty > 5 && styles.inStock,
+                        ]}
+                      >
+                        {stockQty}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={styles.variantInfo}>
-                  <Text style={styles.variantLabel}>Giá bán:</Text>
-                  <Text style={styles.variantValue}>
-                    {formatCurrency(variant.price)}
-                  </Text>
-                </View>
-                <View style={styles.variantInfo}>
-                  <Text style={styles.variantLabel}>Tồn kho:</Text>
-                  <Text
-                    style={[
-                      styles.variantValue,
-                      variant.stockQty < 5 && styles.lowStock,
-                    ]}
-                  >
-                    {variant.stockQty}
-                  </Text>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </ScrollView>
         </View>
       )}
@@ -229,10 +347,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: "flex-start",
   },
+  stockStatusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   stockText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#2E3A59",
+    marginLeft: 4,
   },
   actions: {
     justifyContent: "space-between",
@@ -293,8 +415,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#2E3A59",
   },
-  lowStock: {
+  stockValueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  outOfStock: {
     color: "#FF6B6B",
+    fontWeight: "bold",
+  },
+  lowStock: {
+    color: "#FF9500",
+    fontWeight: "bold",
+  },
+  inStock: {
+    color: "#34C759",
+    fontWeight: "bold",
   },
   footer: {
     flexDirection: "row",

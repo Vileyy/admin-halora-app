@@ -14,9 +14,12 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../redux/store";
 import { InventoryItem, Variant, Media } from "../../types/inventory";
 import { uploadImage } from "../../services/cloudinary";
-import { fetchBrands, Brand } from "../../services/brandService";
+import { Brand } from "../../types/brand";
+import { fetchBrands } from "../../redux/slices/brandSlice";
 
 interface InventoryFormProps {
   initialItem?: InventoryItem;
@@ -47,6 +50,11 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   isLoading = false,
   submitButtonText = "Lưu sản phẩm",
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { brands, loading: loadingBrands } = useSelector(
+    (state: RootState) => state.brands
+  );
+
   const [formData, setFormData] = useState<FormData>({
     name: initialItem?.name || "",
     description: initialItem?.description || "",
@@ -62,25 +70,13 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   });
 
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [showBrandModal, setShowBrandModal] = useState(false);
-  const [loadingBrands, setLoadingBrands] = useState(false);
 
   useEffect(() => {
-    loadBrands();
-  }, []);
-
-  const loadBrands = async () => {
-    setLoadingBrands(true);
-    try {
-      const brandsData = await fetchBrands();
-      setBrands(brandsData);
-    } catch (error) {
-      Alert.alert("Lỗi", "Không thể tải danh sách thương hiệu");
-    } finally {
-      setLoadingBrands(false);
+    if (brands.length === 0) {
+      dispatch(fetchBrands());
     }
-  };
+  }, [dispatch, brands.length]);
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

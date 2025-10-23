@@ -8,6 +8,7 @@ import {
   FlatList,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { RootState, AppDispatch } from "../../redux/store";
@@ -317,7 +318,7 @@ const OrdersScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Quản lý đơn hàng</Text>
@@ -367,7 +368,7 @@ const OrdersScreen: React.FC = () => {
         }}
         onStatusUpdate={handleStatusUpdate}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
