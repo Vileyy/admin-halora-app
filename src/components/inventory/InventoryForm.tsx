@@ -44,6 +44,13 @@ interface FormData {
   variants: FormVariant[];
 }
 
+// Format number to VND currency format (e.g., 95000 -> 95.000)
+const formatCurrencyValue = (value: number | string): string => {
+  const numericValue = String(value).replace(/\D/g, "");
+  if (!numericValue) return "";
+  return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 export const InventoryForm: React.FC<InventoryFormProps> = ({
   initialItem,
   onSubmit,
@@ -63,8 +70,8 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     media: initialItem?.media || [],
     variants: initialItem?.variants?.map((v) => ({
       name: v.name,
-      importPrice: v.importPrice.toString(),
-      price: v.price.toString(),
+      importPrice: formatCurrencyValue(v.importPrice),
+      price: formatCurrencyValue(v.price),
       stockQty: v.stockQty.toString(),
     })) || [{ name: "", importPrice: "", price: "", stockQty: "" }],
   });
@@ -82,13 +89,29 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Remove formatting to get raw number (e.g., 95.000 -> 95000)
+  const unformatCurrency = (value: string): string => {
+    return value.replace(/\./g, "");
+  };
+
   const handleVariantChange = (
     index: number,
     field: keyof FormVariant,
     value: string
   ) => {
     const updatedVariants = [...formData.variants];
-    updatedVariants[index] = { ...updatedVariants[index], [field]: value };
+
+    // Apply currency formatting for price fields
+    if (field === "importPrice" || field === "price") {
+      const formattedValue = formatCurrencyValue(value);
+      updatedVariants[index] = {
+        ...updatedVariants[index],
+        [field]: formattedValue,
+      };
+    } else {
+      updatedVariants[index] = { ...updatedVariants[index], [field]: value };
+    }
+
     setFormData((prev) => ({ ...prev, variants: updatedVariants }));
   };
 
@@ -198,8 +221,8 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           initialItem?.variants?.[index]?.id ||
           `variant_${Date.now()}_${index}`,
         name: v.name,
-        importPrice: parseFloat(v.importPrice),
-        price: parseFloat(v.price),
+        importPrice: parseFloat(unformatCurrency(v.importPrice)),
+        price: parseFloat(unformatCurrency(v.price)),
         stockQty: parseInt(v.stockQty),
         createdAt:
           initialItem?.variants?.[index]?.createdAt || new Date().toISOString(),

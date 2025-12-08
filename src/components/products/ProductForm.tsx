@@ -28,7 +28,7 @@ interface ProductFormProps {
   onSubmit: (productData: any) => Promise<void>;
   isLoading?: boolean;
   submitButtonText?: string;
-  useInventorySelection?: boolean; 
+  useInventorySelection?: boolean;
 }
 
 interface FormVariant {
@@ -36,7 +36,7 @@ interface FormVariant {
   price: string;
   stock: string;
   sku?: string;
-  variantId?: string; 
+  variantId?: string;
 }
 
 interface FormData {
@@ -47,8 +47,8 @@ interface FormData {
   imageUrl: string;
   variants: FormVariant[];
   isFlashDeal: boolean;
-  selectedInventoryId?: string; 
-  originalProductId?: string; 
+  selectedInventoryId?: string;
+  originalProductId?: string;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -63,7 +63,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     (state: RootState) => state.inventory
   );
   const { brands, loading: brandsLoading } = useSelector(
-    (state: RootState) => state.brands 
+    (state: RootState) => state.brands
   );
   const { flashDeals, newProducts } = useSelector(
     (state: RootState) => state.products
@@ -117,7 +117,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       }
     });
 
-    return [...new Set(usedIds)]; 
+    return [...new Set(usedIds)];
   };
 
   const availableInventoryItems = inventoryItems.filter((item) => {
@@ -287,8 +287,71 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      Alert.alert("Lỗi", "Vui lòng kiểm tra lại thông tin nhập vào");
+    const newErrors: { [key: string]: string } = {};
+
+    if (useInventorySelection && !formData.selectedInventoryId) {
+      newErrors.selectedInventoryId = "Vui lòng chọn sản phẩm từ kho";
+    }
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Tên sản phẩm là bắt buộc";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Mô tả sản phẩm là bắt buộc";
+    }
+
+    if (!formData.brand.trim()) {
+      newErrors.brand = "Thương hiệu là bắt buộc";
+    }
+
+    if (!formData.imageUrl) {
+      newErrors.imageUrl = "Hình ảnh sản phẩm là bắt buộc";
+    }
+
+    // Validate variants
+    if (formData.variants.length === 0) {
+      if (useInventorySelection) {
+        newErrors.variants =
+          "Vui lòng chọn ít nhất một dung tích/kích thước từ sản phẩm";
+      } else {
+        newErrors.variants = "Cần có ít nhất một biến thể sản phẩm";
+      }
+    } else {
+      formData.variants.forEach((variant, index) => {
+        if (!variant.size.trim()) {
+          newErrors[`variant_${index}_size`] = "Kích thước là bắt buộc";
+        }
+        if (
+          !variant.price ||
+          isNaN(Number(variant.price)) ||
+          Number(variant.price) <= 0
+        ) {
+          newErrors[`variant_${index}_price`] = "Giá phải là số dương";
+        }
+        if (
+          !variant.stock ||
+          isNaN(Number(variant.stock)) ||
+          Number(variant.stock) < 0
+        ) {
+          newErrors[`variant_${index}_stock`] = "Số lượng phải là số không âm";
+        }
+      });
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      // Debug: Log all errors
+      console.log("Validation errors:", newErrors);
+      const errorMessages = Object.entries(newErrors)
+        .filter(([_, value]) => value)
+        .map(([key, value]) => `• ${value}`)
+        .join("\n");
+      Alert.alert(
+        "Lỗi",
+        errorMessages || "Vui lòng kiểm tra lại thông tin nhập vào"
+      );
       return;
     }
 
