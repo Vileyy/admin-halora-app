@@ -1,6 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Screens
 import DashboardScreen from "../screens/dashboard/DashboardScreen";
@@ -26,6 +27,8 @@ import { BottomTabParamList } from "./types";
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomTabs = () => {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -57,9 +60,9 @@ const BottomTabs = () => {
           backgroundColor: "#FFFFFF",
           borderTopWidth: 1,
           borderTopColor: "#E5E5EA",
-          paddingBottom: Platform.OS === "ios" ? 20 : 5,
-          paddingTop: 5,
-          height: Platform.OS === "ios" ? 85 : 65,
+          paddingBottom: Math.max(insets.bottom, 10),
+          paddingTop: 8,
+          height: 60 + Math.max(insets.bottom, 10),
           elevation: 8,
           shadowColor: "#000",
           shadowOffset: {
